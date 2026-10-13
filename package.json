@@ -1,0 +1,10 @@
+{
+  "name": "company-research-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs && python3 -m http.server 8765 --bind 127.0.0.1 --directory dist",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

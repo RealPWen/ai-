@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="德赛西威单公司投研看板：核心市场分歧、卖方EPS、估值与产业链事件。">
-  <title>德赛西威 · 公司投研看板</title>
+  <meta name="description" content="通用公司投研看板：按股票加载核心市场分歧、卖方EPS、估值与产业链事件。">
+  <title>公司投研看板</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="app.js" defer></script>
+  <script type="module" src="src/main.js"></script>
 </head>
 <body>
   <aside class="sidebar">
     <a class="brand" href="#overview"><span class="brand-mark">研</span><span>公司研究室<small>COMPANY RESEARCH</small></span></a>
     <div class="side-label">跟踪公司</div>
-    <a class="company-switch" href="#overview"><span class="company-avatar">德</span><span>德赛西威<small>002920.SZ</small></span><span class="switch-arrow">⌄</span></a>
+    <button class="company-switch" id="company-switch" aria-haspopup="dialog"><span class="company-avatar">研</span><span class="company-identity"><span id="current-company-name">选择股票</span><small id="current-company-ticker">证券代码</small></span><span class="switch-arrow">⌄</span></button>
     <nav aria-label="研究模块">
       <a class="nav-link active" href="#overview"><span class="nav-symbol">◫</span>研究概览</a>
       <a class="nav-link" href="#debates"><span class="nav-symbol">◇</span>核心市场分歧</a>
@@ -20,19 +20,19 @@
       <a class="nav-link" href="#events"><span class="nav-symbol">◎</span>新闻与行业事件</a>
       <a class="nav-link" href="#notes"><span class="nav-symbol">✎</span>研究笔记</a>
     </nav>
-    <div class="side-bottom"><span class="status-dot"></span> 单公司样例 · v0.1<p>先搭框架，再逐步补齐研究。</p></div>
+    <div class="side-bottom"><span class="status-dot"></span> 通用投研模板 · v0.2<p>切换标的，加载对应的研究。</p></div>
   </aside>
 
   <div class="workspace">
-    <header class="topbar"><div class="breadcrumb">投研看板 <span>/</span> <strong>德赛西威</strong></div><div class="top-actions"><span class="version-pill">初始样例</span><button class="button subtle" id="sources-button">数据来源 ↗</button></div></header>
+    <header class="topbar"><div class="breadcrumb">投研看板 <span>/</span> <strong id="breadcrumb-company">选择股票</strong></div><div class="top-actions"><span class="version-pill">通用模板</span><button class="button subtle" id="change-company">切换股票 ⌄</button><button class="button subtle" id="sources-button">数据来源 ↗</button></div></header>
     <main>
       <section class="hero" id="overview">
-        <div class="hero-copy"><div class="eyebrow">公司跟踪 / 汽车电子</div><h1>德赛西威 <span>002920.SZ</span></h1><p class="hero-description">从智能座舱到智能驾驶，持续跟踪产品、客户需求与盈利兑现。</p><div class="business-tags"><span>智能座舱</span><span>智能驾驶</span><span>网联服务</span></div><a class="source-inline" href="https://www.desaysv.com/solution.html" target="_blank" rel="noopener noreferrer">业务分类来源：公司官网 ↗</a></div>
+        <div class="hero-copy"><div class="eyebrow">公司跟踪 / 投研模板</div><h1>选择股票 <span>证券代码</span></h1><p class="hero-description">选择标的后，逐步补齐公司资料、行情、卖方预测与产业链事件。</p><div class="business-tags"><span>业务分类待接入</span></div><a class="source-inline" hidden target="_blank" rel="noopener noreferrer">公司资料来源 ↗</a></div>
         <div class="hero-side"><div class="research-label">当前研究状态</div><strong>框架已就绪</strong><p>行情、卖方预测与事件尚未接入。</p><a class="button primary" href="#notes">记一条研究笔记 <span>↗</span></a></div>
       </section>
 
       <div class="metrics" aria-label="行情与估值状态">
-        <article class="metric"><span>最新收盘价 <small>CNY</small></span><strong>—</strong><p><i></i>待接入日线行情</p></article>
+        <article class="metric"><span>最新收盘价 <small>—</small></span><strong>—</strong><p><i></i>待接入日线行情</p></article>
         <article class="metric"><span>PE-TTM</span><strong>—</strong><p><i></i>待接入每日估值</p></article>
         <article class="metric"><span>PB</span><strong>—</strong><p><i></i>待接入每日估值</p></article>
         <article class="metric"><span>卖方预测样本</span><strong>未收集</strong><p><i></i>逐家券商核验口径</p></article>
@@ -44,22 +44,27 @@
       </div>
 
       <section class="section-block" id="debates"><div class="section-heading"><div><span class="kicker">静态信息 · 01</span><h2>核心市场分歧</h2><p>先明确要研究的问题，再用来源补充不同观点。</p></div><span class="status-pill">待搜索与核验</span></div><div class="debate-grid">
-        <article class="debate-card"><div class="card-top"><span class="number-label">01 / 增长</span><span class="question-tag">研究问题</span></div><h3>智能驾驶业务的增长，能否转化为持续的利润增长？</h3><p>关注产品放量、订单转收入以及不同产品的盈利能力。</p><div class="verification"><span>验证指标</span><strong>业务收入 · 毛利率 · 订单兑现</strong></div><details><summary>需要补充的证据 <span>＋</span></summary><p>最新财报的业务数据、卖方对收入与利润的预测，以及有明确作者和日期的不同观点。</p></details></article>
-        <article class="debate-card"><div class="card-top"><span class="number-label">02 / 竞争</span><span class="question-tag">研究问题</span></div><h3>座舱与智驾产品迭代，能否维持公司的竞争力？</h3><p>关注平台升级、客户拓展、竞争方案和潜在价格压力。</p><div class="verification"><span>验证指标</span><strong>新品量产 · 客户结构 · 产品价格</strong></div><details><summary>需要补充的证据 <span>＋</span></summary><p>公司正式披露、同行的产品与经营资料，以及针对竞争格局的公开行业研报。未经确认的客户关系单独标注。</p></details></article>
-        <article class="debate-card"><div class="card-top"><span class="number-label">03 / 估值</span><span class="question-tag">研究问题</span></div><h3>当前估值，是否充分反映了未来盈利的增长？</h3><p>对照卖方预测分歧、历史估值位置与盈利修订方向。</p><div class="verification"><span>验证指标</span><strong>EPS 修订 · PE 分位 · 盈利兑现</strong></div><details><summary>需要补充的证据 <span>＋</span></summary><p>每日 PE/PB、同一财年的逐券商 EPS 明细，以及预测更新日期。目前尚未取得这些数据，不判断贵或便宜。</p></details></article>
+        <!-- Research cards are rendered from data/companies.js or backend view models. -->
+        <noscript><p class="empty-message">请启用 JavaScript 以显示研究模块。</p></noscript>
       </div><p class="section-note">后续每条观点展示作者 / 机构、日期、原文链接与读取范围；雪球个人观点标记“低质量引用”。</p></section>
 
       <section class="section-block" id="valuation"><div class="section-heading"><div><span class="kicker">静态信息 · 02</span><h2>EPS 与估值情景</h2><p>预测仅使用卖方数据，极值来自已收集的可比样本。</p></div><span class="status-pill">待接入卖方预测</span></div><div class="panel"><div class="table-scroll"><table><thead><tr><th>预测财年</th><th>最低 EPS / 券商</th><th>样本一致预期</th><th>最高 EPS / 券商</th><th>样本数</th><th>来源及日期</th></tr></thead><tbody><tr><td>2026E</td><td>—</td><td>—</td><td>—</td><td>未收集</td><td>—</td></tr><tr><td>2027E</td><td>—</td><td>—</td><td>—</td><td>未收集</td><td>—</td></tr><tr><td>2028E</td><td>—</td><td>—</td><td>—</td><td>未收集</td><td>—</td></tr></tbody></table></div><div class="table-note">每家券商保留截止日有效的最新预测；币种、基本 / 稀释及报告 / 调整后 EPS 分开核验。一致预期注明参与机构与汇总来源。</div></div><div class="band-grid"><article class="panel band-panel"><div class="panel-heading"><h3>PE-TTM band</h3><span class="plain-badge">历史估值</span></div><div class="band-empty"><span class="band-decoration"></span><p>接入历史每日 PE-TTM 后，展示估值曲线、分位区间与当前位置。</p></div></article><article class="panel band-panel"><div class="panel-heading"><h3>PB band</h3><span class="plain-badge">历史估值</span></div><div class="band-empty"><span class="band-decoration"></span><p>接入历史每日 PB 后，展示估值曲线、分位区间与当前位置。</p></div></article></div></section>
 
       <section class="section-block" id="events"><div class="section-heading"><div><span class="kicker">动态信息 · 05</span><h2>当日新闻与行业事件</h2><p>覆盖公司、同行和上下游，保留原文事实与影响分析。</p></div><span class="status-pill">事件尚未获取</span></div><div class="panel events-panel"><div class="event-filters" aria-label="事件分类"><button class="selected" data-event="全部" aria-pressed="true">全部</button><button data-event="公司" aria-pressed="false">公司</button><button data-event="同行" aria-pressed="false">同行</button><button data-event="上游" aria-pressed="false">上游</button><button data-event="下游" aria-pressed="false">下游</button><button data-event="政策" aria-pressed="false">政策</button></div><div class="events-empty"><span class="empty-icon small">◎</span><div><h3 id="event-title">等待第一条事件</h3><p id="event-caption">尚未获取新闻或公告。接入后按发布时间、影响路径和来源展示。</p></div></div><div class="event-bottom"><span>当日新增 / 历史背景 / 未来催化剂分别展示</span><a href="https://www.cninfo.com.cn/" target="_blank" rel="noopener noreferrer">查看巨潮公告 ↗</a></div></div></section>
 
-      <section class="section-block notes-section" id="notes"><div class="section-heading"><div><span class="kicker">个人研究</span><h2>研究笔记</h2><p>先记录问题和线索，后续再整理为有证据的结论。</p></div><button class="button subtle" id="export-note">导出笔记 ↓</button></div><div class="panel note-panel"><label for="research-note">德赛西威 · 我的观察</label><textarea id="research-note" placeholder="例如：下次阅读财报时，核对智能驾驶业务的收入增长与毛利率变化。&#10;&#10;可以记下原文链接、待验证的数字或面向卖方的问题。"></textarea><div class="note-footer"><span id="note-status" role="status">仅保存在当前浏览器，不会上传</span><span id="note-count">0 字</span></div></div></section>
+      <section class="section-block notes-section" id="notes"><div class="section-heading"><div><span class="kicker">个人研究</span><h2>研究笔记</h2><p>先记录问题和线索，后续再整理为有证据的结论。</p></div><button class="button subtle" id="export-note">导出笔记 ↓</button></div><div class="panel note-panel"><label for="research-note">当前公司 · 我的观察</label><textarea id="research-note" placeholder="例如：下次阅读财报时，核对主营业务收入、利润率与现金流变化。&#10;&#10;可以记下原文链接、待验证的数字或面向卖方的问题。"></textarea><div class="note-footer"><span id="note-status" role="status">仅保存在当前浏览器，不会上传</span><span id="note-count">0 字</span></div></div></section>
 
-      <footer><span>德赛西威 · 公司投研看板</span><span>初始样例 / 尚未连接 Tushare 或 GPT API</span></footer>
+      <footer><span id="footer-company">公司投研看板</span><span id="connection-status">通用模板 / 后端接口尚未配置</span></footer>
     </main>
   </div>
 
-  <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-heading"><div><span class="kicker">资料与状态</span><h2 id="source-title">数据来源</h2></div><button class="close-button" id="close-sources" aria-label="关闭数据来源">×</button></div><p class="dialog-intro">当前只有公司代码和业务分类已核实，研究数据将逐步补充。</p><div class="source-row"><div><strong>德赛西威官网</strong><p>证券代码、智能座舱 / 智能驾驶 / 网联服务</p></div><a href="https://www.desaysv.com/" target="_blank" rel="noopener noreferrer">已核实 ↗</a></div><div class="source-row"><div><strong>Tushare</strong><p>日线行情、每日 PE/PB、逐券商盈利预测</p></div><span>待接入</span></div><div class="source-row"><div><strong>公开研报与外部观点</strong><p>核心分歧、作者、报告日期及证据</p></div><span>待检索</span></div><div class="source-row"><div><strong>新闻与公告</strong><p>公司及产业链事件、原文与发布时间</p></div><span>待获取</span></div><div class="dialog-note">首次核验公司资料：2026-10-13。页面中的研究问题由本样例提出，不代表市场已有明确的多空分歧。</div></dialog>
+  <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-heading"><div><span class="kicker">资料与状态</span><h2 id="source-title">数据来源</h2></div><button class="close-button" id="close-sources" aria-label="关闭数据来源">×</button></div><p class="dialog-intro">当前公司的资料与研究数据按模块加载；未接入的数据保持为空。</p><div class="source-row" id="profile-source"><div><strong>公司资料</strong><p>当前公司资料来源待接入</p></div><span>待接入</span></div><div class="source-row"><div><strong>Tushare</strong><p>日线行情、每日 PE/PB、逐券商盈利预测</p></div><span>待接入</span></div><div class="source-row"><div><strong>公开研报与外部观点</strong><p>核心分歧、作者、报告日期及证据</p></div><span>待检索</span></div><div class="source-row"><div><strong>新闻与公告</strong><p>公司及产业链事件、原文与发布时间</p></div><span>待获取</span></div><div class="dialog-note">模板研究问题仅用于提示研究方向。实际观点、行情、预测与事件均按当前证券代码加载，并保留来源。</div></dialog>
+  <dialog id="company-dialog" aria-labelledby="company-title">
+    <div class="dialog-heading"><div><span class="kicker">研究标的</span><h2 id="company-title">选择股票</h2></div><button class="close-button" id="close-company" aria-label="关闭股票选择">×</button></div>
+    <p class="dialog-intro">使用同一套模板，查看不同公司的研究数据。</p>
+    <form id="company-list-form" class="company-form"><label for="company-select">预置标的</label><div class="company-select-row"><select id="company-select"></select><button class="button primary" type="submit">查看标的</button></div></form>
+    <form id="company-custom-form" class="company-form custom-company"><h3>输入其他股票</h3><label for="company-code">证券代码</label><input id="company-code" required maxlength="32" placeholder="例如 600519.SH / 02313.HK" autocomplete="off" spellcheck="false"><label for="company-name">股票名称（可选）</label><input id="company-name" maxlength="80" placeholder="未填写时显示证券代码" autocomplete="off"><p class="company-hint">代码需与后端约定一致，保留交易所后缀和前导零。行情及研究内容由后端返回。</p><p id="company-error" role="alert" hidden></p><button class="button primary" type="submit">切换到此股票 ↗</button></form>
+  </dialog>
   <div class="toast" id="toast" role="status"></div>
 </body>
 </html>
