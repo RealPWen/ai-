@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { FORECAST_FIELDS, validateForecastRows, forecastRange, forecastValidationError } from './forecast-store.mjs';
@@ -10,7 +11,7 @@ const ERROR_CODES = { permission: 'permission_denied', authentication: 'authenti
 function kindOf(error) { return error?.code === 'DATABASE_ERROR' ? 'database' : KINDS.has(error?.kind) ? error.kind : 'unknown'; }
 async function atomicJson(path, value, compressed = false) {
   const bytes = Buffer.from(`${JSON.stringify(value)}\n`), temporary = `${path}.tmp-${process.pid}`;
-  await writeFile(temporary, compressed ? gzipSync(bytes) : bytes, { mode: 0o600 }); await rename(temporary, path);
+  await writeFile(temporary, compressed ? gzipSync(bytes) : bytes, { mode: 0o600 }); await replaceFile(temporary, path);
 }
 async function readCache(path) {
   try { return JSON.parse(gunzipSync(await readFile(path)).toString('utf8')); }

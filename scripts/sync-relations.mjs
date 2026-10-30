@@ -1,11 +1,13 @@
-import { readFile, mkdir, writeFile, rename, stat } from 'node:fs/promises';
+import { replaceFile } from '../backend/src/replace-file.mjs';
+import { dataPath } from '../backend/src/runtime-config.mjs';
+import { readFile, mkdir, writeFile, stat } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import { createRelationsStore, validateRelationSubjects } from '../backend/market-data/relations-store.mjs';
 import { todayShanghai, validDate } from '../backend/src/input.mjs';
 
-const STORAGE = fileURLToPath(new URL('../backend/storage/company-relations/', import.meta.url));
+const STORAGE = dataPath('company-relations');
 const MODES = new Set(['init', 'claim', 'import', 'status', 'release', 'fail']);
 const VALUES = new Set(['mode', 'run-id', 'as-of', 'worker', 'lease-token', 'limit', 'lease-minutes', 'tickers', 'file', 'error-code', 'subjects-file']);
 const IDENTIFIER = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/;
@@ -82,7 +84,7 @@ export function parseRelationArgs(argv, today = todayShanghai()) {
 async function atomicJson(path, value) {
   const temporary = `${path}.${randomUUID()}.tmp`;
   await writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
-  await rename(temporary, path);
+  await replaceFile(temporary, path);
 }
 
 export async function runRelationsCommand({ argv = process.argv.slice(2), env = process.env,

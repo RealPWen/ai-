@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { resolve } from 'node:path';
 import { createTushareClient } from '../backend/market-data/tushare-client.mjs';
 import { createNewsStore } from '../backend/market-data/news-store.mjs';
@@ -39,7 +40,7 @@ try {
       }
     }
     const report = await syncNews({ client, store, mode, refresh: options.refresh ?? false, sourceName: options.source ?? '',
-      startDate: range.start, endDate: range.end, now: runNow, cacheDir: resolve('backend/storage/market-data'), log: value => console.log(JSON.stringify(value)) });
+      startDate: range.start, endDate: range.end, now: runNow, cacheDir: dataPath('market-data'), log: value => console.log(JSON.stringify(value)) });
     console.log(JSON.stringify({ type: 'news_summary', ...report }));
     process.exitCode = report.status === 'completed' ? 0 : 2;
   }

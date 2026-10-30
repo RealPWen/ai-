@@ -1,0 +1,3 @@
+# Only the IMA PDF/OCR feature needs Python. Node dependencies use npm ci.
+pypdfium2>=4.30,<6
+Pillow>=10,<13

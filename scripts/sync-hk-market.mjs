@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { fileURLToPath } from 'node:url';
 import { createHkMarketStore } from '../backend/market-data/hk-market-store.mjs';
 import { createTushareClient } from '../backend/market-data/tushare-client.mjs';
@@ -12,7 +13,7 @@ try {
     store = createHkMarketStore({ connectionString: process.env.DATABASE_URL });
     const client = createTushareClient({ token: process.env.TUSHARE_TOKEN });
     const result = await updateRollingHongKongMarket({ store, client, runDate: todayShanghai(),
-      cacheDir: fileURLToPath(new URL('../backend/storage/market-data/', import.meta.url)), retryNoData: process.argv.includes('--retry-no-data'),
+      cacheDir: dataPath('market-data'), retryNoData: process.argv.includes('--retry-no-data'),
       log: value => console.log(JSON.stringify(value)) });
     process.exitCode = ['succeeded', 'already_completed'].includes(result.status) ? 0 : 2;
   }

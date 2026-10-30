@@ -63,7 +63,7 @@ export function createWatchlistAttributionRuntime({ connectionString, watchlistS
   }finally{if(locked)await lock.query('SELECT pg_advisory_unlock(786215,62)');lock.release();}
  }
  function runOnce(options={}){
-  if(closing||!enabled)return Promise.resolve({status:'disabled'});if(inFlight)return inFlight;
+  if(closing||(!enabled&&!options.force))return Promise.resolve({status:'disabled'});if(inFlight)return inFlight;
   inFlight=perform(options).then(result=>{lastResult=result;emit({type:'watchlist_attribution_update',...result});return result}).finally(()=>{inFlight=null});return inFlight;
  }
  return {migrate,runOnce,trigger(){const work=inFlight?inFlight.then(()=>runOnce({force:true})):runOnce({force:true});void work.catch(()=>{});},snapshot:()=>({enabled,running:!!inFlight,lastResult}),start(){if(timer||!enabled)return;const tick=()=>{const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',hour:'2-digit',hourCycle:'h23'}).format(now()));if(hour>=6)void runOnce().catch(()=>{});};timer=setInterval(tick,pollMs);timer.unref?.();tick();},async close(){closing=true;clearInterval(timer);await inFlight;await pool.end();}};

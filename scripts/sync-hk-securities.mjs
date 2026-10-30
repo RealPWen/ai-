@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { resolve } from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { createTushareClient } from '../backend/market-data/tushare-client.mjs';
@@ -22,7 +23,7 @@ try {
     if (mode !== 'download') store = createHkSecuritiesStore({ connectionString: process.env.DATABASE_URL });
     const universe = JSON.parse(await readFile(new URL('../backend/market-data/hk-universe.json', import.meta.url), 'utf8'));
     const report = await syncHkPoolSecurities({ universe, client, store, mode, refresh: options.refresh ?? false,
-      cacheDir: resolve('backend/storage/market-data'), log: value => console.log(JSON.stringify(value)) });
+      cacheDir: dataPath('market-data'), log: value => console.log(JSON.stringify(value)) });
     console.log(JSON.stringify({ type: 'hk_securities_summary', ...report }));
   }
 } catch (error) {

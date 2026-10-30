@@ -1,5 +1,6 @@
+import { replaceFile } from './replace-file.mjs';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
-import { chmod, mkdir, open, readFile, rename, rm } from 'node:fs/promises';
+import { chmod, mkdir, open, readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { ResearchError } from './errors.mjs';
 import { createIDTokenVerifier, secureEqual } from './oauth-jwt.mjs';
@@ -65,7 +66,7 @@ export async function createChatGPTAuth({ directory, redirectUri, appName = '公
       file = await open(temporary, 'wx', 0o600);
       await file.writeFile(`${JSON.stringify(value)}\n`);
       await file.sync(); await file.close(); file = undefined;
-      await rename(temporary, path); await chmod(path, 0o600);
+      await replaceFile(temporary, path); await chmod(path, 0o600);
     } finally { await file?.close(); await rm(temporary, { force: true }); }
   }
   let host = await readJSON(hostPath);

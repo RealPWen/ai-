@@ -1,10 +1,12 @@
 # 公司投研看板
 
+TideOS 部署请先读 [INTEGRATION.md](INTEGRATION.md)：统一数据根、关闭内部调度、单次批处理、代理前缀、Windows 启动与数据库迁移均在其中。修改前版本保留在 `pre-tideos-20261030` 标签；原本机运行方式仍可使用。
+
 项目目录：`sites/company-research/`。通用桌面前端和独立本地后端，德赛西威只是默认示例。「核心市场分歧」现在使用 **DeepSeek API**，先从 ima 读取研报并整理参考观点，再通过官方 Search API 联网核验，最后由 `deepseek-v4-pro` 的 Responses API 综合整理，整理最多 3 个问题的正反观点及证据，无需登录 ChatGPT。
 
 ## 启动
 
-需要 Node.js 22+ 和 PostgreSQL。首次执行 `npm install`。后端 `.env` 配置：
+需要 Node.js 22.21+ 和 PostgreSQL。首次执行 `npm ci`。后端 `.env` 配置：
 
 ```dotenv
 AI_PROVIDER=deepseek

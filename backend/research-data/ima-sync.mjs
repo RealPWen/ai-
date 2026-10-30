@@ -1,4 +1,6 @@
-import { readFile, writeFile, mkdir, chmod, open, stat, statfs, rename, unlink, copyFile } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { dataPath } from '../src/runtime-config.mjs';
+import { readFile, writeFile, mkdir, chmod, open, stat, statfs, unlink, copyFile } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import { homedir } from 'node:os';
 import path from 'node:path';
@@ -6,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 
 export const LIBRARY = { id: 'ima_kb_LJNC7uye', name: '彭博社➕国际投行研报' };
-const DEFAULT_ROOT = fileURLToPath(new URL('../storage/research-data/ima/', import.meta.url));
+const DEFAULT_ROOT = dataPath('research-data/ima');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 export class SyncError extends Error {
   constructor(code, { retryable = false, fatal = false } = {}) { super(code); this.code = code; this.retryable = retryable; this.fatal = fatal; }
@@ -116,7 +118,7 @@ export async function syncIma({ mode = 'sync', workers = 3, root = DEFAULT_ROOT,
     if (mode !== 'status') {
       const temporary = path.join(root, `status-${randomUUID()}.tmp`);
       await writeFile(temporary, JSON.stringify(status, null, 2), { mode: 0o600 });
-      await rename(temporary, path.join(root, 'status.json'));
+      await replaceFile(temporary, path.join(root, 'status.json'));
     }
     if (runId) await sql('UPDATE research_data.ima_sync_runs SET heartbeat_at=now() WHERE run_id=$1', [runId]);
     return status;
@@ -205,7 +207,7 @@ export async function syncIma({ mode = 'sync', workers = 3, root = DEFAULT_ROOT,
       const rel = path.join('files', sha.slice(0, 2), `${sha}${ext}`); const dest = path.join(root, rel);
       await mkdir(path.dirname(dest), { recursive: true, mode: 0o700 });
       let present = false; try { present = (await stat(dest)).size === bytes; } catch {}
-      if (present) await unlink(tmp); else await rename(tmp, dest);
+      if (present) await unlink(tmp); else await replaceFile(tmp, dest);
       await sql(`UPDATE research_data.ima_documents SET download_status='downloaded',local_path=$3,bytes=$4,sha256=$5,source_host=$6,content_type=$7,downloaded_at=now(),updated_at=now(),last_error=NULL WHERE library_id=$1 AND media_id=$2`, [lib, item.media_id, rel, bytes, sha, u.hostname, response.headers.get('content-type')]);
       if ([7, 13].includes(item.media_type) && bytes <= 10 * 1024 * 1024) {
         let text; try { text = new TextDecoder('utf-8', { fatal: true }).decode(await readFile(dest)); } catch { text = null; }

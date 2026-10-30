@@ -1,5 +1,6 @@
+import { replaceFile } from '../src/replace-file.mjs';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { clsPlainText, matchClsArticle, CLS_SOURCE_API, CLS_SOURCE_NAME } from './cls-news-sync.mjs';
 import { createNewsMatcher } from './news-matching.mjs';
@@ -72,7 +73,7 @@ function listRows(body, bootstrap) {
 }
 
 async function jsonFile(path, value) {
-  const temporary = `${path}.tmp-${process.pid}`; await writeFile(temporary, `${JSON.stringify(value)}\n`, { mode: 0o600 }); await rename(temporary, path);
+  const temporary = `${path}.tmp-${process.pid}`; await writeFile(temporary, `${JSON.stringify(value)}\n`, { mode: 0o600 }); await replaceFile(temporary, path);
 }
 const rangeKey = range => `${range.start.replace(/[-:.]/g, '')}-${range.end.replace(/[-:.]/g, '')}`;
 const validRange = range => range && Number.isFinite(Date.parse(range.start)) && Number.isFinite(Date.parse(range.end))

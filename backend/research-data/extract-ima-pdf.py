@@ -1,14 +1,22 @@
 """Bounded first-page extraction; no network, original files stay temporary."""
 import json
 import os
-import resource
 import subprocess
 import sys
 import time
 from pathlib import Path
 
-resource.setrlimit(resource.RLIMIT_CPU, (55, 60))
-resource.setrlimit(resource.RLIMIT_FSIZE, (64 * 1024**2, 64 * 1024**2))
+# Windows has no resource module; the parent still enforces a 50-second timeout,
+# file-size/download bounds and a four-page extraction limit on every platform.
+try:
+    import resource
+except ImportError:
+    resource = None
+if resource is not None:
+    resource.setrlimit(resource.RLIMIT_CPU, (55, 60))
+    resource.setrlimit(resource.RLIMIT_FSIZE, (64 * 1024**2, 64 * 1024**2))
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 def extract():
     import pypdfium2 as pdfium
@@ -36,7 +44,7 @@ def extract():
                     image = path.parent / f'page-{index + 1}.png'
                     try:
                         bitmap.to_pil().save(image)
-                        result = subprocess.run([os.environ.get('IMA_TESSERACT', '/opt/homebrew/bin/tesseract'), str(image), 'stdout', '-l', 'eng+chi_sim', '--psm', '3'],
+                        result = subprocess.run([os.environ.get('IMA_TESSERACT') or 'tesseract', str(image), 'stdout', '-l', 'eng+chi_sim', '--psm', '3'],
                             capture_output=True, timeout=max(1, min(15, deadline - time.monotonic())), check=True,
                             env={**os.environ, 'OMP_THREAD_LIMIT': '1'})
                         text = result.stdout.decode('utf-8', errors='replace')

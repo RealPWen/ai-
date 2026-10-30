@@ -1,10 +1,11 @@
+import { apiPath } from '../../config.js';
 export function initRelationAttribution({getContext}){
  const panel=document.getElementById('relation-attribution'),text=document.getElementById('relative-analysis'),status=document.getElementById('relative-status'),sources=document.getElementById('relative-sources'),button=document.getElementById('relative-generate');
  let key='',scope='all',data=null,serial=0,timer=null,busy=false,controller=null;
  const names={all:'全部关联公司',upstream:'上游',peer:'同行',downstream:'下游'};
  const messages={fresh:'已保存',missing:'尚未生成',stale:'归因待更新',relations_changed:'名单已变化，归因待更新',unavailable:'比较数据尚未就绪'};
  const failure={DEEPSEEK_INSUFFICIENT_BALANCE:'AI余额不足',DEEPSEEK_INVALID_JSON:'AI格式修复失败',RELATIVE_INVALID_EVIDENCE:'引用校验未通过',RELATIVE_INVALID_SHAPE:'分析格式未通过校验',RELATIVE_NO_SOURCES:'联网未取得可靠资料',RELATIVE_INTERRUPTED:'任务已中断，可重试'};
- async function request(path,body,signal){const r=await fetch(path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:signal??AbortSignal.timeout(20000)});const result=await r.json();if(!r.ok)throw new Error(result.error?.message||'读取归因失败');return result.data;}
+ async function request(path,body,signal){const r=await fetch(apiPath(path),{method:body?'POST':'GET',headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:signal??AbortSignal.timeout(20000)});const result=await r.json();if(!r.ok)throw new Error(result.error?.message||'读取归因失败');return result.data;}
  function render(){
   const ctx=getContext();panel.hidden=false;
   const running=busy||data?.job?.status==='running';button.disabled=running||ctx.asOf!==new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai'}).format(new Date());

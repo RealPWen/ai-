@@ -1,5 +1,6 @@
+import { replaceFile } from '../src/replace-file.mjs';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile, rename, readdir } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createNewsMatcher } from './news-matching.mjs';
 import { newsRange } from './news-sync.mjs';
@@ -88,7 +89,7 @@ export function matchClsArticle(record, securities, matcher = createNewsMatcher(
 }
 
 async function atomicJson(path, data) {
-  const temporary = `${path}.tmp-${process.pid}`; await writeFile(temporary, `${JSON.stringify(data)}\n`, { mode: 0o600 }); await rename(temporary, path);
+  const temporary = `${path}.tmp-${process.pid}`; await writeFile(temporary, `${JSON.stringify(data)}\n`, { mode: 0o600 }); await replaceFile(temporary, path);
 }
 
 function validCache(value, url) {

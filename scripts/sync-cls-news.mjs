@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { resolve } from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { createNewsStore } from '../backend/market-data/news-store.mjs';
@@ -32,7 +33,7 @@ try {
     }
     if (mode !== 'download') { store = createNewsStore({ connectionString: process.env.DATABASE_URL }); await store.migrate(); }
     const report = await syncClsNews({ store, urls, mode, maxArticles, includeHomepage: !options['no-homepage'],
-      startDate: range.start, endDate: range.end, now: runNow, cacheDir: resolve('backend/storage/market-data'), log: value => console.log(JSON.stringify(value)) });
+      startDate: range.start, endDate: range.end, now: runNow, cacheDir: dataPath('market-data'), log: value => console.log(JSON.stringify(value)) });
     console.log(JSON.stringify({ type: 'cls_news_summary', ...report }));
     process.exitCode = report.failed > 0 ? 2 : 0;
   }

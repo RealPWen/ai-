@@ -26,10 +26,13 @@
     "data:worker": "node --env-file-if-exists=.env scripts/daily-data-worker.mjs",
     "data:hk:market": "node --env-file-if-exists=.env scripts/sync-hk-market.mjs",
     "data:hk:audit": "node --env-file-if-exists=.env scripts/audit-hk-market.mjs",
-    "data:hk:index": "node --env-file-if-exists=.env scripts/sync-hk-index.mjs"
+    "data:hk:index": "node --env-file-if-exists=.env scripts/sync-hk-index.mjs",
+    "tideos:check": "node --env-file-if-exists=.env.tideos scripts/tideos-run.mjs --check-only",
+    "tideos:run": "node --env-file-if-exists=.env.tideos scripts/tideos-run.mjs",
+    "tideos:board": "node --env-file-if-exists=.env.tideos scripts/start-board.mjs"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.21"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

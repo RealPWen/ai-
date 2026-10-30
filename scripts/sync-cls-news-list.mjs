@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { resolve } from 'node:path';
 import { createNewsStore } from '../backend/market-data/news-store.mjs';
 import { syncClsNewsList } from '../backend/market-data/cls-news-list.mjs';
@@ -24,7 +25,7 @@ try {
     const now = new Date();
     if (!options.resume) newsRange({ startDate: options.start, endDate: options.end, now });
     store = createNewsStore({ connectionString: process.env.DATABASE_URL }); await store.migrate();
-    const report = await syncClsNewsList({ store, cacheDir: resolve('backend/storage/market-data'), startDate: options.start, endDate: options.end,
+    const report = await syncClsNewsList({ store, cacheDir: dataPath('market-data'), startDate: options.start, endDate: options.end,
       now, resume: options.resume ?? false, maxPages, log: value => console.log(JSON.stringify(value)) });
     console.log(JSON.stringify({ type: 'cls_list_summary', ...report, fingerprints: undefined }));
     process.exitCode = ['page_limit', 'range_start_confirmed', 'range_already_reached'].includes(report.stopReason) ? 0 : 2;

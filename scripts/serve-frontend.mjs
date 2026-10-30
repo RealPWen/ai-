@@ -39,11 +39,14 @@ function machineHosts() {
     .filter(Boolean).map(({ address }) => isIP(address) === 6 ? `[${address.toLowerCase()}]` : address)]);
 }
 
-function validHost(request, server, hosts) {
+const loopback = address => address === '::1' || /^127\./.test(address ?? '') || /^::ffff:127\./i.test(address ?? '');
+
+function validHost(request, server, hosts, publicOrigin) {
   const value = request.headers.host;
   if (typeof value !== 'string' || /[\s@/#?\\]/u.test(value)) return null;
   let origin;
   try { origin = new URL(`http://${value}`); } catch { return null; }
+  if (publicOrigin && loopback(request.socket.remoteAddress) && origin.host === new URL(publicOrigin).host) return publicOrigin;
   const port = Number(origin.port || 80);
   if (!hosts.has(origin.hostname) || port !== server.address()?.port) return null;
   return origin.origin;
@@ -56,14 +59,14 @@ function sendJSON(request, response, status, body) {
   response.end(request.method === 'HEAD' ? undefined : text);
 }
 
-function proxyAPI(request, response, target) {
+function proxyAPI(request, response, target, path = request.url) {
   // Neither the request Host, forwarding headers nor URL parameters select this destination.
   const headers = { host: target.host };
   for (const name of ['accept', 'content-type', 'content-length']) {
     if (request.headers[name] !== undefined) headers[name] = request.headers[name];
   }
   const upstream = httpRequest({ hostname: target.hostname, port: Number(target.port || 80),
-    path: request.url, method: request.method === 'HEAD' ? 'GET' : request.method, headers }, incoming => {
+    path, method: request.method === 'HEAD' ? 'GET' : request.method, headers }, incoming => {
     const forwarded = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
     for (const name of ['content-type', 'content-length']) if (incoming.headers[name]) forwarded[name] = incoming.headers[name];
     response.writeHead(incoming.statusCode, forwarded);
@@ -84,7 +87,15 @@ function proxyAPI(request, response, target) {
 }
 
 /** Local and LAN pages use the same API permissions through the fixed backend. */
-export function createFrontendServer({ root = DEFAULT_ROOT, backendOrigin = 'http://127.0.0.1:8000', proxyEnabled = true } = {}) {
+export function createFrontendServer({ root = DEFAULT_ROOT, backendOrigin = 'http://127.0.0.1:8000', proxyEnabled = true,
+  basePath = '', publicOrigin = '', } = {}) {
+  basePath = basePath.replace(/\/$/, '');
+  if (basePath && !/^\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+$/.test(basePath)) throw new Error('Invalid frontend base path.');
+  if (publicOrigin) {
+    const url = new URL(publicOrigin);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.pathname !== '/' || url.search || url.hash) throw new Error('Public origin must contain only scheme, host and optional port.');
+    publicOrigin = url.origin;
+  }
   const directory = resolve(root);
   const target = fixedBackend(backendOrigin), hosts = machineHosts();
   const server = createServer(async (request, response) => {
@@ -94,7 +105,7 @@ export function createFrontendServer({ root = DEFAULT_ROOT, backendOrigin = 'htt
         'Content-Length': Buffer.byteLength(body), 'X-Content-Type-Options': 'nosniff', ...headers });
       response.end(request.method === 'HEAD' ? undefined : body);
     };
-    const requestOrigin = validHost(request, server, hosts);
+    const requestOrigin = validHost(request, server, hosts, publicOrigin);
     if (!requestOrigin) return sendJSON(request, response, 403, { error: { code: 'HOST_NOT_ALLOWED', message: '请通过本机地址或局域网地址访问。' } });
     let pathname;
     try {
@@ -104,14 +115,27 @@ export function createFrontendServer({ root = DEFAULT_ROOT, backendOrigin = 'htt
     } catch { return sendError(400, 'Bad request.'); }
     if (/[\u0000-\u001f\u007f]/u.test(pathname)) return sendError(400, 'Bad request.');
     if (pathname.includes('\\') || pathname.split('/').some(part => part.startsWith('.'))) return sendError(403, 'Forbidden.');
+    if (basePath) {
+      if (pathname === basePath) {
+        response.writeHead(307, { Location: `${basePath}/${request.url.includes('?') ? request.url.slice(request.url.indexOf('?')) : ''}`, 'Cache-Control': 'no-store' });
+        return response.end();
+      }
+      if (!pathname.startsWith(`${basePath}/`)) return sendError(404, 'Not found.');
+      pathname = pathname.slice(basePath.length);
+    }
     if (proxyEnabled && (pathname === '/api' || pathname.startsWith('/api/'))) {
-      if ((request.headers.origin && request.headers.origin !== requestOrigin) || request.headers['sec-fetch-site'] === 'cross-site') {
+      const approvedOrigins = new Set([requestOrigin]);
+      if (publicOrigin && loopback(request.socket.remoteAddress)) approvedOrigins.add(publicOrigin);
+      if ((request.headers.origin && !approvedOrigins.has(request.headers.origin)) || request.headers['sec-fetch-site'] === 'cross-site') {
         return sendJSON(request, response, 403, { error: { code: 'ORIGIN_NOT_ALLOWED', message: '当前网页来源未获准访问。' } });
       }
       if (!['GET', 'HEAD', 'POST'].includes(request.method)) {
         return sendError(405, 'Method not allowed.', { Allow: 'GET, HEAD, POST' });
       }
-      return proxyAPI(request, response, target);
+      const query = request.url.includes('?') ? request.url.slice(request.url.indexOf('?')) : '';
+      // Decode only the route. The original query retains its escaping and values.
+      const route = pathname.split('/').map(encodeURIComponent).join('/');
+      return proxyAPI(request, response, target, `${route}${query}`);
     }
     if (!['GET', 'HEAD'].includes(request.method)) return sendError(405, 'Method not allowed.', { Allow: 'GET, HEAD' });
     const candidate = resolve(directory, `.${pathname === '/' ? '/index.html' : pathname}`);
@@ -148,7 +172,8 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     console.error('FRONTEND_HOST must be an IP address or localhost.');
     process.exitCode = 1;
   } else {
-    const server = createFrontendServer({ backendOrigin: `http://127.0.0.1:${backendPort}` });
+    const server = createFrontendServer({ backendOrigin: `http://127.0.0.1:${backendPort}`,
+      basePath: process.env.COMPANY_RESEARCH_BASE_PATH || '', publicOrigin: process.env.COMPANY_RESEARCH_PUBLIC_ORIGIN || '' });
     server.on('error', error => { console.error(`Frontend server failed (${error.code ?? 'server_error'}).`); process.exitCode = 1; });
     server.listen(port, host, () => console.log(`Frontend: http://${isIP(host) === 6 ? `[${host}]` : host}:${port}`));
   }

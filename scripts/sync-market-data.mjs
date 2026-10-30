@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { resolve } from 'node:path';
 import { createTushareClient } from '../backend/market-data/tushare-client.mjs';
 import { createMarketStore } from '../backend/market-data/postgres-store.mjs';
@@ -19,7 +20,7 @@ try {
   const client = mode === 'import' ? null : createTushareClient({ token: process.env.TUSHARE_TOKEN, intervalMs: 400 });
   if (mode !== 'download') store = createMarketStore({ connectionString: process.env.DATABASE_URL });
   const report = await syncDailyData({ client, store, mode, markets, startDate: args.start, endDate: args.end,
-    cacheDir: resolve('backend/storage/market-data'), log: value => console.log(JSON.stringify(value)) });
+    cacheDir: dataPath('market-data'), log: value => console.log(JSON.stringify(value)) });
   console.log(JSON.stringify({ type: 'summary', ...report }));
   process.exitCode = report.status === 'completed' ? 0 : 2;
 } catch (error) {

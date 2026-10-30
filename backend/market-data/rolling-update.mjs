@@ -1,4 +1,5 @@
-import { mkdir, writeFile, rename } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { normalizeTradeDate } from './postgres-store.mjs';
@@ -69,7 +70,7 @@ async function saveCalendar(cacheDir, window, dates, market) {
   const temporary = `${path}.tmp-${process.pid}-${randomUUID()}`;
   const value = { version: 1, market, startDate: window.windowStart, endDate: window.windowEnd, dates, fetchedAt: new Date().toISOString() };
   await writeFile(temporary, `${JSON.stringify(value)}\n`, { mode: 0o600 });
-  await rename(temporary, path);
+  await replaceFile(temporary, path);
 }
 
 function collectorSummary(report, apiName, market) {

@@ -1,4 +1,5 @@
-import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
+import { replaceFile } from '../backend/src/replace-file.mjs';
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
@@ -157,7 +158,7 @@ export async function auditHkMarket({connectionString,runDate=todayShanghai(),ca
   const output=resolve(outputPath??join(root,'backend/storage/market-data/audits',`hk-market-${window.runDate.replaceAll('-','')}`,'database-verification.json'));
   await mkdir(dirname(output),{recursive:true,mode:0o700});
   const temporary=`${output}.tmp-${randomUUID()}`;
-  await writeFile(temporary,`${JSON.stringify(report,null,2)}\n`,{mode:0o600});await rename(temporary,output);
+  await writeFile(temporary,`${JSON.stringify(report,null,2)}\n`,{mode:0o600});await replaceFile(temporary,output);
   return {path:output,status:report.status,integrityPassed:report.integrityPassed,priceCoverageComplete:report.priceCoverageComplete,totals:report.totals,integrity:report.integrity,
     aSharesReference:report.aSharesReference,researchPool:report.researchPool};
 }

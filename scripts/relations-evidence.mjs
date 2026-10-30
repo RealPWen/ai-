@@ -1,4 +1,6 @@
-import { readFile, writeFile, mkdir, rename, stat, unlink, open } from 'node:fs/promises';
+import { replaceFile } from '../backend/src/replace-file.mjs';
+import { dataPath } from '../backend/src/runtime-config.mjs';
+import { readFile, writeFile, mkdir, stat, unlink, open } from 'node:fs/promises';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { randomUUID } from 'node:crypto';
@@ -8,7 +10,7 @@ import {
   buildEvidenceCatalog, searchEvidenceCatalog, composeResearchFromEvidence,
 } from '../backend/market-data/relations-evidence.mjs';
 
-const STORAGE = fileURLToPath(new URL('../backend/storage/company-relations/', import.meta.url));
+const STORAGE = dataPath('company-relations');
 const ID = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/;
 const TICKER = /^(?:\d{6}\.(SH|SZ|BJ)|\d{5}\.HK)$/;
 const ALLOWED = {
@@ -73,7 +75,7 @@ async function atomicJson(path, value) {
   const temporary = `${path}.${randomUUID()}.tmp`;
   try {
     await writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, { flag: 'wx', mode: 0o600 });
-    await rename(temporary, path);
+    await replaceFile(temporary, path);
   } finally {
     await unlink(temporary).catch(() => {});
   }

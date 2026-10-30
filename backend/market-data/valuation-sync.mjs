@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { normalizeTradeDate } from './postgres-store.mjs';
@@ -16,7 +17,7 @@ async function readJson(path, compressed = false) {
 }
 async function atomicJson(path, value, compressed = false) {
   const bytes = Buffer.from(`${JSON.stringify(value)}\n`), temporary = `${path}.tmp-${process.pid}`;
-  await writeFile(temporary, compressed ? gzipSync(bytes) : bytes, { mode: 0o600 }); await rename(temporary, path);
+  await writeFile(temporary, compressed ? gzipSync(bytes) : bytes, { mode: 0o600 }); await replaceFile(temporary, path);
 }
 function validCalendar(value, start, end) {
   if (!value || value.version !== 1 || value.market !== 'A' || value.startDate !== start || value.endDate !== end || !Array.isArray(value.dates) || !value.dates.length) return false;

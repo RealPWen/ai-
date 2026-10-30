@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename, unlink } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { HK_SECURITY_FIELDS, HK_LIST_STATUSES, validateHkSecurities, isHistoricalHkSecurityAlias } from './hk-securities-store.mjs';
@@ -12,7 +13,7 @@ async function readSnapshot(path) {
 }
 async function writeSnapshot(path, value) {
   const temporary = `${path}.tmp-${randomUUID()}`;
-  try { await writeFile(temporary, `${JSON.stringify(value)}\n`, { mode: 0o600 }); await rename(temporary, path); }
+  try { await writeFile(temporary, `${JSON.stringify(value)}\n`, { mode: 0o600 }); await replaceFile(temporary, path); }
   finally { try { await unlink(temporary); } catch (error) { if (error.code !== 'ENOENT') throw error; } }
 }
 

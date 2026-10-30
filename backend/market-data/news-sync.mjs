@@ -1,5 +1,6 @@
+import { replaceFile } from '../src/replace-file.mjs';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { createNewsMatcher } from './news-matching.mjs';
@@ -131,7 +132,7 @@ export function normalizeNewsRows(rows, { start, end, sourceApi = NEWS_API, sour
 
 async function atomicJson(path, value, compressed = false) {
   const bytes = Buffer.from(`${JSON.stringify(value)}\n`), temporary = `${path}.tmp-${process.pid}`;
-  await writeFile(temporary, compressed ? gzipSync(bytes) : bytes, { mode: 0o600 }); await rename(temporary, path);
+  await writeFile(temporary, compressed ? gzipSync(bytes) : bytes, { mode: 0o600 }); await replaceFile(temporary, path);
 }
 const filePart = value => iso(value).replace(/[-:.]/g, '');
 async function readWindowCache(path, expected) {

@@ -1,9 +1,11 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
+import { pathToFileURL } from 'node:url';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import pg from 'pg';
 import { createTushareClient } from '../backend/market-data/tushare-client.mjs';
 import { normalizeTradeDate } from '../backend/market-data/postgres-store.mjs';
 
-const directory = new URL('../backend/storage/market-data/securities/', import.meta.url);
+const directory = pathToFileURL(dataPath('market-data/securities') + '/');
 const client = new pg.Client({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 10000 });
 let connected = false;
 try {

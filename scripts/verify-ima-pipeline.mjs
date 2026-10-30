@@ -1,3 +1,5 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
+import { pathToFileURL } from 'node:url';
 // Explicit paid verification. Replay uses previously obtained IMA evidence;
 // it never substitutes for a successful live IMA request or overwrites reports.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -12,7 +14,7 @@ import { createDebateStore } from '../backend/src/debate-store.mjs';
 
 const mode = process.argv[2];
 if (!['live', 'replay'].includes(mode)) throw new Error('Usage: node --env-file=.env scripts/verify-ima-pipeline.mjs live|replay (uses paid DeepSeek calls)');
-const directory = new URL('../backend/storage/research-data/ima/pipeline-verification/', import.meta.url);
+const directory = pathToFileURL(dataPath('research-data/ima/pipeline-verification') + '/');
 await mkdir(directory, { recursive: true, mode: 0o700 });
 const db = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 2 });
 const schema = `ima_pipeline_test_${randomUUID().replaceAll('-', '')}`;

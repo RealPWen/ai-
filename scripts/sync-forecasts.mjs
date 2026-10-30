@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { resolve } from 'node:path';
 import { createTushareClient } from '../backend/market-data/tushare-client.mjs';
 import { createForecastStore } from '../backend/market-data/forecast-store.mjs';
@@ -19,7 +20,7 @@ try {
     const mode = options.mode ?? 'sync', client = mode === 'import' ? null : createTushareClient({ token: process.env.TUSHARE_TOKEN, intervalMs: 400 });
     if (mode !== 'download') store = createForecastStore({ connectionString: process.env.DATABASE_URL });
     const report = await syncForecasts({ client, store, mode, refresh: options.refresh ?? false, startDate: options.start, endDate: options.end,
-      cacheDir: resolve('backend/storage/market-data'), log: value => console.log(JSON.stringify(value)) });
+      cacheDir: dataPath('market-data'), log: value => console.log(JSON.stringify(value)) });
     const { ranges, ...summary } = report; console.log(JSON.stringify({ type: 'forecast_summary', ...summary })); process.exitCode = report.status === 'completed' ? 0 : 2;
   }
 } catch {

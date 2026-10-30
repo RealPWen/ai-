@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 import { gzipSync, gunzipSync } from 'node:zlib';
@@ -16,7 +17,7 @@ function safeCode(error) {
   return {network:'network_error',timeout:'network_error',rate_limit:'rate_limited',permission:'permission_denied',http:'permission_denied',database:'database_error',validation:'validation_error',invalid_response:'validation_error',incomplete_window:'incomplete_window',observation_date_changed:'observation_date_changed'}[error?.kind]??'provider_error';
 }
 async function quarantine(path) {
-  try { await rename(path,`${path}.rejected-${randomUUID()}`); } catch(error) { if(error.code!=='ENOENT')throw error; }
+  try { await replaceFile(path,`${path}.rejected-${randomUUID()}`); } catch(error) { if(error.code!=='ENOENT')throw error; }
 }
 function validatePayload(value,identity) {
   if(value?.source!==identity.source || value?.apiName!==identity.apiName)throw invalid();
@@ -38,7 +39,7 @@ async function cachedOrCollect({path,identity,collector,now,strictObservationDat
   const value=await collector(identity); validatePayload(value,identity);
   const payload={version:1,...identity,rows:value.rows,coverage:value.coverage,raw:value.raw??null,fetchedAt:now().toISOString()};
   const temporary=`${path}.tmp-${process.pid}-${randomUUID()}`;
-  await writeFile(temporary,gzipSync(Buffer.from(JSON.stringify(payload)+'\n')),{mode:0o600}); await rename(temporary,path);
+  await writeFile(temporary,gzipSync(Buffer.from(JSON.stringify(payload)+'\n')),{mode:0o600}); await replaceFile(temporary,path);
   return {...payload,cached:false};
 }
 
