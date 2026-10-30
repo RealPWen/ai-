@@ -1,70 +1,161 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
+<!DOCTYPE html><html lang="zh-CN"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="通用公司投研看板：按股票加载核心市场分歧、卖方EPS、估值与产业链事件。">
   <title>公司投研看板</title>
+  <script id="local-file-check">if (location.protocol === 'file:') document.documentElement.classList.add('local-file-mode');</script>
+  <style>
+    .local-file-entry{display:none}
+    html.local-file-mode{background:#f4f7fa}
+    html.local-file-mode body> :not(.local-file-entry){display:none!important}
+    html.local-file-mode .local-file-entry{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:32px;box-sizing:border-box}
+    .local-file-card{max-width:560px;background:white;border:1px solid #dce5eb;border-radius:16px;padding:40px;box-shadow:0 12px 42px #21394c0a;font:15px/1.8 system-ui,sans-serif;color:#63788a}
+    .local-file-card h1{font-size:24px;line-height:1.45;margin:0 0 14px;color:#203b50}
+    .local-file-card p{margin:0 0 24px}
+    .local-file-card a{display:inline-block;background:#147f78;color:white;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:600}
+    .local-file-card small{display:block;margin-top:16px;font-size:13px;color:#7f919f}
+  </style>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="research-status.css">
+  <link rel="stylesheet" href="picker.css"><link rel="stylesheet" href="charts.css">
+  <link rel="stylesheet" href="watchlist.css">
+  <link rel="stylesheet" href="relations.css">
+  <link rel="stylesheet" href="news.css">
+  <link rel="stylesheet" href="attribution.css">
+  <link rel="stylesheet" href="interface.css">
   <script type="module" src="src/main.js"></script>
 </head>
 <body>
-  <aside class="sidebar">
-    <a class="brand" href="#overview"><span class="brand-mark">研</span><span>公司研究室<small>COMPANY RESEARCH</small></span></a>
-    <div class="side-label">跟踪公司</div>
-    <button class="company-switch" id="company-switch" aria-haspopup="dialog"><span class="company-avatar">研</span><span class="company-identity"><span id="current-company-name">选择股票</span><small id="current-company-ticker">证券代码</small></span><span class="switch-arrow">⌄</span></button>
-    <nav aria-label="研究模块">
-      <a class="nav-link active" href="#overview"><span class="nav-symbol">◫</span>研究概览</a>
-      <a class="nav-link" href="#debates"><span class="nav-symbol">◇</span>核心市场分歧</a>
-      <a class="nav-link" href="#valuation"><span class="nav-symbol">▤</span>EPS 与估值</a>
-      <a class="nav-link" href="#events"><span class="nav-symbol">◎</span>新闻与行业事件</a>
-      <a class="nav-link" href="#notes"><span class="nav-symbol">✎</span>研究笔记</a>
-    </nav>
-    <div class="side-bottom"><span class="status-dot"></span> 通用投研模板 · v0.2<p>切换标的，加载对应的研究。</p></div>
-  </aside>
-
+  <section class="local-file-entry" aria-label="打开本地投研服务"><div class="local-file-card"><h1>请从本地服务打开看板</h1><p>当前是 HTML 文件预览，无法正常加载行情和研究数据。</p><a href="http://127.0.0.1:8765/#market">打开投研看板 →</a><small>本地服务地址：127.0.0.1:8765</small></div></section>
+  <header class="masthead">
+    <div class="masthead-inner"><button id="watchlist-toggle" class="sidebar-toggle" type="button" aria-controls="watchlist-sidebar" aria-expanded="true">收起自选栏</button>
+      <div><h1>投研工作台</h1></div>
+      <div class="stamp"><strong id="masthead-date">公司研究工作台</strong><span class="breadcrumb visually-hidden">当前标的 <b id="breadcrumb-company">选择股票</b></span></div>
+    <div class="stock-search-area global-search"><button id="change-company" class="stock-search-trigger" type="button" aria-haspopup="dialog" aria-controls="company-dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg><span>搜索股票名称或代码</span><kbd>/</kbd></button></div><div class="top-actions"><button class="button subtle" id="sources-button">数据来源 ↗</button></div></div>
+  </header>
   <div class="workspace">
-    <header class="topbar"><div class="breadcrumb">投研看板 <span>/</span> <strong id="breadcrumb-company">选择股票</strong></div><div class="top-actions"><span class="version-pill">通用模板</span><button class="button subtle" id="change-company">切换股票 ⌄</button><button class="button subtle" id="sources-button">数据来源 ↗</button></div></header>
-    <main>
-      <section class="hero" id="overview">
-        <div class="hero-copy"><div class="eyebrow">公司跟踪 / 投研模板</div><h1>选择股票 <span>证券代码</span></h1><p class="hero-description">选择标的后，逐步补齐公司资料、行情、卖方预测与产业链事件。</p><div class="business-tags"><span>业务分类待接入</span></div><a class="source-inline" hidden target="_blank" rel="noopener noreferrer">公司资料来源 ↗</a></div>
-        <div class="hero-side"><div class="research-label">当前研究状态</div><strong>框架已就绪</strong><p>行情、卖方预测与事件尚未接入。</p><a class="button primary" href="#notes">记一条研究笔记 <span>↗</span></a></div>
+    
+    <aside id="watchlist-sidebar" class="watchlist-sidebar" aria-label="自选股票">
+      <div class="watchlist-heading"><h2>自选股票</h2><span id="watchlist-count" class="watchlist-count">0</span><button id="watchlist-collapse" class="watchlist-collapse" type="button" aria-controls="watchlist-sidebar" aria-expanded="true">收起</button></div>
+      <button id="watchlist-add" class="watchlist-add" type="button">＋ 加入自选</button>
+      <div id="watchlist-status" class="watchlist-status" role="status" hidden></div>
+      <div id="watchlist-list" class="watchlist-list"></div>
+      <button id="watchlist-search" class="watchlist-search" type="button" aria-haspopup="dialog" aria-controls="company-dialog">搜索股票</button>
+    </aside>
+    <main class="wrap">
+      <section class="company-overview" aria-label="公司摘要"><section class="stock-context" aria-label="研究标的选择">
+        <div class="stock-context-main"><button class="company-switch" id="company-switch" type="button" aria-haspopup="dialog" aria-controls="company-dialog" title="选择或切换研究标的"><span class="company-avatar" aria-hidden="true">研</span><span class="company-identity"><span id="current-company-name">选择股票</span><small id="current-company-ticker">证券代码</small></span><span class="company-market-badge" id="current-company-market">—</span><span class="switch-arrow" aria-hidden="true">⌄</span></button></div>
+        
+      </section><div class="metrics" aria-label="行情与估值状态">
+        <article class="metric"><span>最新收盘价 <small>—</small></span><strong>—</strong><p class="quote-change">等待日线数据</p><span class="quote-trade-date">收盘日线 · 非实时</span></article>
+        <article class="metric"><span>PE-TTM</span><strong>—</strong><p>等待该交易日估值</p><span class="valuation-source">Tushare daily_basic</span></article>
+        <article class="metric"><span>PB</span><strong>—</strong><p>等待该交易日估值</p><span class="valuation-source">Tushare daily_basic</span></article>
+        
+      </div></section><div class="company-toolbar">
+      
+      <nav class="module-nav" aria-label="研究模块"><a class="nav-link active" href="#market">行情与归因</a><a class="nav-link" href="#valuation">EPS 与估值</a><a class="nav-link" href="#debates">核心分歧</a><a class="nav-link" href="#relations">上下游与同行</a><a class="nav-link" href="#events">新闻事件</a><a class="nav-link" href="#notes">研究笔记</a></nav>
+      
+    </div>
+      
+      <article class="company-sheet">
+      <section class="hero company-header" id="overview" hidden>
+        <div class="hero-copy"><h1>选择股票 <span>证券代码</span></h1><p class="hero-description"></p><div class="business-tags"><span>业务分类待接入</span></div><a class="source-inline" hidden target="_blank" rel="noopener noreferrer">公司资料来源 ↗</a></div>
+        <div class="hero-side"><a class="button subtle" href="#notes">记笔记 <span aria-hidden="true">↗</span></a></div>
       </section>
+      <div class="company-content">
+      <div class="debate-controls panel" id="data-date-controls" hidden><div class="debate-date"><label for="research-date">数据截止日期</label><input type="date" id="research-date" required min="1900-01-01"><span>用于行情、EPS、估值、关系及事件</span></div><p class="research-service-error" id="data-date-error" role="status" hidden></p></div>
+      
 
-      <div class="metrics" aria-label="行情与估值状态">
-        <article class="metric"><span>最新收盘价 <small>—</small></span><strong>—</strong><p><i></i>待接入日线行情</p></article>
-        <article class="metric"><span>PE-TTM</span><strong>—</strong><p><i></i>待接入每日估值</p></article>
-        <article class="metric"><span>PB</span><strong>—</strong><p><i></i>待接入每日估值</p></article>
-        <article class="metric"><span>卖方预测样本</span><strong>未收集</strong><p><i></i>逐家券商核验口径</p></article>
-      </div>
+      
+      
+      
 
-      <div class="overview-grid">
-        <section class="panel price-panel"><div class="panel-heading"><div><span class="kicker">动态信息</span><h2>行情观察</h2></div><div class="segmented" aria-label="行情区间"><button class="selected" data-period="1个月" aria-pressed="true">1M</button><button data-period="6个月" aria-pressed="false">6M</button><button data-period="1年" aria-pressed="false">1Y</button></div></div><div class="chart-empty"><div class="chart-grid"></div><div class="empty-content"><span class="empty-icon">⌁</span><h3>等待第一组行情</h3><p id="price-caption">接入最近 1个月日线后，显示价格走势。</p><span class="empty-tag">当前没有行情数据</span></div></div><div class="chart-footer"><span>数据范围：未取得</span><span>行情对照与股价归因 · 后续补充</span></div></section>
-        <section class="panel next-panel"><div class="panel-heading"><div><span class="kicker">逐步完善</span><h2>接下来补什么</h2></div><span class="plain-badge">3 个模块</span></div><ol class="next-steps"><li><span class="step-number">01</span><div><strong>先补核心市场分歧</strong><p>检索公开卖方报告和外部观点，保留证据。</p></div></li><li><span class="step-number">02</span><div><strong>再接 EPS 与估值数据</strong><p>统一财年、币种和口径，生成估值图。</p></div></li><li><span class="step-number">03</span><div><strong>加入公司与产业链事件</strong><p>筛选新增信息，解释对公司的影响。</p></div></li></ol><div class="gentle-note">页面中的问题是研究起点；尚未形成市场分歧结论。</div></section>
-      </div>
+      
 
-      <section class="section-block" id="debates"><div class="section-heading"><div><span class="kicker">静态信息 · 01</span><h2>核心市场分歧</h2><p>先明确要研究的问题，再用来源补充不同观点。</p></div><span class="status-pill">待搜索与核验</span></div><div class="debate-grid">
-        <!-- Research cards are rendered from data/companies.js or backend view models. -->
-        <noscript><p class="empty-message">请启用 JavaScript 以显示研究模块。</p></noscript>
-      </div><p class="section-note">后续每条观点展示作者 / 机构、日期、原文链接与读取范围；雪球个人观点标记“低质量引用”。</p></section>
+      
 
-      <section class="section-block" id="valuation"><div class="section-heading"><div><span class="kicker">静态信息 · 02</span><h2>EPS 与估值情景</h2><p>预测仅使用卖方数据，极值来自已收集的可比样本。</p></div><span class="status-pill">待接入卖方预测</span></div><div class="panel"><div class="table-scroll"><table><thead><tr><th>预测财年</th><th>最低 EPS / 券商</th><th>样本一致预期</th><th>最高 EPS / 券商</th><th>样本数</th><th>来源及日期</th></tr></thead><tbody><tr><td>2026E</td><td>—</td><td>—</td><td>—</td><td>未收集</td><td>—</td></tr><tr><td>2027E</td><td>—</td><td>—</td><td>—</td><td>未收集</td><td>—</td></tr><tr><td>2028E</td><td>—</td><td>—</td><td>—</td><td>未收集</td><td>—</td></tr></tbody></table></div><div class="table-note">每家券商保留截止日有效的最新预测；币种、基本 / 稀释及报告 / 调整后 EPS 分开核验。一致预期注明参与机构与汇总来源。</div></div><div class="band-grid"><article class="panel band-panel"><div class="panel-heading"><h3>PE-TTM band</h3><span class="plain-badge">历史估值</span></div><div class="band-empty"><span class="band-decoration"></span><p>接入历史每日 PE-TTM 后，展示估值曲线、分位区间与当前位置。</p></div></article><article class="panel band-panel"><div class="panel-heading"><h3>PB band</h3><span class="plain-badge">历史估值</span></div><div class="band-empty"><span class="band-decoration"></span><p>接入历史每日 PB 后，展示估值曲线、分位区间与当前位置。</p></div></article></div></section>
+      <section class="panel price-panel" id="market" aria-labelledby="market-title">
+        <div class="panel-heading"><div><span class="section-eyebrow">市场表现</span><h2 id="market-title">前复权日 K 线与行业指数</h2></div><div class="market-heading-actions"><div class="segmented" aria-label="行情区间"><button class="selected" data-period="1个月" aria-pressed="true">1M</button><button data-period="6个月" aria-pressed="false">6M</button><button data-period="1年" aria-pressed="false">1Y</button></div></div></div>
+        <div class="market-attribution-layout"><div class="market-chart-column">
+        <div class="chart-empty"><div class="empty-content"><span class="empty-icon">⌁</span><h3>等待日 K 线</h3><p id="price-caption">读取当前标的在研究截止日之前的前复权日线与申万行业指数。</p><span class="empty-tag">A 股日 K 线 · 非实时 · 前复权</span></div></div>
+        <div class="chart-footer" hidden><span>数据范围：尚未取得</span><span>数据来源：Tushare · 成交量单位：手 · 成交额单位：千元</span></div>
+        </div><section class="stock-attribution" id="stock-attribution" aria-labelledby="attribution-title" aria-busy="false">
+          <div class="attribution-heading"><div class="attribution-heading-title"><h3 id="attribution-title">AI 涨跌归因</h3><span id="attribution-period" class="attribution-period">1个月</span><span id="attribution-status" class="attribution-status" role="status">等待读取</span></div><div class="attribution-actions"><details class="action-menu"><summary aria-label="更多归因操作">更多 <span aria-hidden="true">⌄</span></summary><div class="action-menu-content"><button class="button subtle" id="reload-attribution" type="button">读取已保存归因</button></div></details><button class="button" id="generate-attribution" type="button" disabled>生成三个周期归因</button><button class="button subtle" id="retry-attribution" type="button" hidden>重试失败周期</button></div></div>
+          <p id="attribution-generated-time" class="attribution-caption" hidden></p>
+          <p id="attribution-note" class="attribution-note" role="status" hidden></p>
+          <div id="attribution-progress" class="attribution-progress" aria-label="三个周期的生成进度" hidden></div>
+          <div id="attribution-body"><p class="attribution-empty">正在读取当前股票已保存的涨跌归因。</p></div>
+        </section></div>
+      </section><section class="section-block" id="valuation">
+        <div class="section-heading"><div><h2>EPS 与估值</h2></div><span class="status-pill">等待读取卖方预测</span></div><article class="metric forecast-metric"><span>卖方预测样本</span><strong>—</strong><p>等待卖方预测数据</p></article>
+        <div class="panel forecast-panel">
+          <p id="forecast-summary" class="forecast-summary" aria-live="polite"></p>
+          <div class="table-scroll"><table class="forecast-summary-table"><thead><tr><th>预测财年</th><th>最低 EPS / 券商</th><th>样本均值</th><th>最高 EPS / 券商</th><th>有效券商数</th><th>来源及研报日期</th></tr></thead><tbody><tr><td colspan="6" class="forecast-empty">等待读取当前标的的卖方 EPS 预测</td></tr></tbody></table></div>
+          <div id="forecast-sample-details" class="forecast-sample-details"></div>
+          <div class="table-note" hidden>卖方预测按币种与 EPS 口径分别统计；样本窗口、来源与研报日期随当前标的加载。</div>
+        </div>
+        <div class="valuation-band-controls"><strong>历史估值区间</strong><div class="segmented" role="group" aria-label="历史估值窗口"><button type="button" data-band-period="6m" aria-pressed="false">6M</button><button type="button" class="selected" data-band-period="1y" aria-pressed="true">1Y</button></div></div>
+        <div class="band-grid"><article class="panel band-panel" aria-labelledby="pe-band-title"><div class="panel-heading"><h3 id="pe-band-title">PE TTM</h3><span class="plain-badge">近 1 年</span></div><div class="band-empty valuation-band-body"><div class="valuation-band-empty-state">等待读取历史 PE-TTM 走势与分位区间。</div></div></article><article class="panel band-panel" aria-labelledby="pb-band-title"><div class="panel-heading"><h3 id="pb-band-title">PB</h3><span class="plain-badge">近 1 年</span></div><div class="band-empty valuation-band-body"><div class="valuation-band-empty-state">等待读取历史 PB 走势与分位区间。</div></div></article></div></section><section class="section-block" id="debates">
+        <div class="section-heading debate-header"><div class="debate-header-title"><h2>核心市场分歧</h2><span class="debate-generated-time" id="debate-generated-time" hidden></span><span class="status-pill" hidden>尚未生成分歧</span></div>
+        <form class="debate-controls panel" id="debates-form">
+          <div class="debate-actions"><button class="button primary" id="generate-debates" type="submit" disabled>等待 AI 连接状态</button><details class="action-menu"><summary aria-label="更多操作">更多 <span aria-hidden="true">⌄</span></summary><div class="action-menu-content"><button class="button subtle" id="reload-debates" type="button" title="读取已保存内容">重新读取</button></div></details><button class="button subtle" id="cancel-debates" type="button" hidden>取消等待</button></div>
+          <p class="research-service-error" id="ai-service-error" role="status" hidden></p>
+          <div class="research-activity" id="debate-activity" data-tone="neutral" role="status" aria-live="polite" aria-atomic="true" hidden><div class="research-activity-heading"><strong id="debate-activity-title">准备开始研究</strong><span id="debate-activity-context"></span></div><p id="debate-activity-note"></p></div>
+        </form>
+        </div>
+        <div class="debate-grid"><p class="empty-message">暂无已保存分歧，点击“生成分歧”开始。</p><noscript><p>请启用 JavaScript 以显示研究模块。</p></noscript></div>
+        <div class="report-evidence-grid">
+          <details class="report-coverage panel report-disclosure" id="debate-coverage" hidden></details>
+          <details class="report-sources panel report-disclosure" id="debate-sources" hidden></details>
+        </div>
+      </section><section class="section-block" id="relations" aria-labelledby="relations-title">
+        <div class="section-heading"><div><h2 id="relations-title">上下游与同行</h2></div><div class="relations-heading-actions"><span class="status-pill" id="relations-status">等待读取</span><button class="button relation-ai-button" id="research-relations" type="button" disabled>AI识别上下游及同行</button><button class="button subtle" id="edit-relations" type="button" disabled>修改上下游</button></div></div>
+        <div class="relations-ai-activity" id="relations-ai-activity" role="status" aria-live="polite" hidden><div class="relations-ai-activity-heading"><strong id="relations-ai-title"></strong><span id="relations-ai-context"></span></div><p id="relations-ai-note" hidden></p></div>
+        <div class="relations-controls"><div class="relations-filters" role="group" aria-label="关联公司分类"><button type="button" class="selected" data-relation-filter="all" aria-pressed="true" disabled>全部 <b>—</b></button><button type="button" data-relation-filter="upstream" aria-pressed="false" disabled><i class="relation-filter-dot" aria-hidden="true"></i>上游 <b>—</b></button><button type="button" data-relation-filter="peer" aria-pressed="false" disabled><i class="relation-filter-dot" aria-hidden="true"></i>同行 <b>—</b></button><button type="button" data-relation-filter="downstream" aria-pressed="false" disabled><i class="relation-filter-dot" aria-hidden="true"></i>下游 <b>—</b></button></div><span id="relations-context" class="relations-context">研究截止 —</span><button id="relations-columns-toggle" class="button subtle" type="button" aria-pressed="false" aria-controls="relations-content">全部指标</button></div>
+        <div class="relations-empty" id="relations-empty" role="status"><span aria-hidden="true">↔</span><strong>等待读取关联公司</strong><p hidden></p></div>
+        <div id="relations-content" hidden><div class="relations-table-wrap" tabindex="0" role="region" aria-label="关联公司行情对照表，可横向滚动"><table class="relations-table"><thead><tr><th scope="col">公司 / 代码</th><th scope="col">关系 / 依据</th><th scope="col">收盘价</th><th scope="col">1 周</th><th scope="col">1 个月</th><th scope="col">6 个月</th><th scope="col">1 年</th><th scope="col">PE-TTM</th><th scope="col">PB</th><th scope="col" class="relation-gap-start" title="当前标的1周涨跌幅减去关联股1周涨跌幅；当前标的行显示当前筛选的平均差值">1周差值</th><th scope="col" title="当前标的6个月涨跌幅减去关联股6个月涨跌幅；当前标的行显示当前筛选的平均差值">6个月差值</th></tr></thead><tbody id="relation-table-body"></tbody></table></div><p id="relation-filter-note" class="relation-filter-note" hidden></p></div>
+        <section id="relation-attribution" class="relation-attribution" aria-label="AI 相对表现归因">
+          <div class="relative-heading"><h3>AI 相对表现归因</h3><button id="relative-generate" type="button">生成相对归因</button></div>
+          <p id="relative-status" role="status">等待读取</p>
+          <p class="relative-meta">基于同期公开资料的可能解释，不代表已证实的股价因果。</p>
+          <p id="relative-analysis">融合1周和6个月，比较具体上下游及同行公司的经营差异。</p>
+          <div id="relative-sources"></div>
+        </section>
 
-      <section class="section-block" id="events"><div class="section-heading"><div><span class="kicker">动态信息 · 05</span><h2>当日新闻与行业事件</h2><p>覆盖公司、同行和上下游，保留原文事实与影响分析。</p></div><span class="status-pill">事件尚未获取</span></div><div class="panel events-panel"><div class="event-filters" aria-label="事件分类"><button class="selected" data-event="全部" aria-pressed="true">全部</button><button data-event="公司" aria-pressed="false">公司</button><button data-event="同行" aria-pressed="false">同行</button><button data-event="上游" aria-pressed="false">上游</button><button data-event="下游" aria-pressed="false">下游</button><button data-event="政策" aria-pressed="false">政策</button></div><div class="events-empty"><span class="empty-icon small">◎</span><div><h3 id="event-title">等待第一条事件</h3><p id="event-caption">尚未获取新闻或公告。接入后按发布时间、影响路径和来源展示。</p></div></div><div class="event-bottom"><span>当日新增 / 历史背景 / 未来催化剂分别展示</span><a href="https://www.cninfo.com.cn/" target="_blank" rel="noopener noreferrer">查看巨潮公告 ↗</a></div></div></section>
-
-      <section class="section-block notes-section" id="notes"><div class="section-heading"><div><span class="kicker">个人研究</span><h2>研究笔记</h2><p>先记录问题和线索，后续再整理为有证据的结论。</p></div><button class="button subtle" id="export-note">导出笔记 ↓</button></div><div class="panel note-panel"><label for="research-note">当前公司 · 我的观察</label><textarea id="research-note" placeholder="例如：下次阅读财报时，核对主营业务收入、利润率与现金流变化。&#10;&#10;可以记下原文链接、待验证的数字或面向卖方的问题。"></textarea><div class="note-footer"><span id="note-status" role="status">仅保存在当前浏览器，不会上传</span><span id="note-count">0 字</span></div></div></section>
+        <div id="relation-coverage"></div>
+      </section><section class="section-block" id="events"><div class="section-heading"><div><h2>新闻与行业事件</h2><p id="events-window">近三个月</p></div><span id="events-status" class="status-pill">等待同步</span></div><div class="panel events-panel"><div class="news-toolbar"><div class="event-filters" aria-label="资讯分类"><button class="selected" data-event="公司" aria-pressed="true" type="button">公司</button><button data-event="同行" aria-pressed="false" type="button">同行</button><button data-event="上游" aria-pressed="false" type="button">上游</button><button data-event="下游" aria-pressed="false" type="button">下游</button></div><button id="events-refresh" class="news-refresh" type="button">刷新列表</button></div><div class="events-empty news-list" id="events-list" aria-live="polite" aria-busy="false"><p class="news-empty">正在读取近三个月资讯…</p></div><div class="news-pagination"><span id="events-result-summary"></span><button id="events-load-more" class="news-more" type="button" hidden>加载更多</button></div><div id="events-source-status" class="news-source-status" hidden></div><div class="event-bottom"><a href="https://www.cninfo.com.cn/" target="_blank" rel="noopener noreferrer">查看巨潮公告 ↗</a></div></div></section><section class="section-block notes-section" id="notes"><div class="section-heading"><div><h2>研究笔记</h2></div><button class="button subtle" id="export-note">导出笔记 ↓</button></div><div class="panel note-panel"><label for="research-note">当前公司 · 我的观察</label><textarea maxlength="50000" id="research-note" placeholder="记录观点、待验证事项或原文链接…"></textarea><div class="note-footer"><span id="note-status" role="status">正在读取笔记…</span><button class="button subtle" id="note-retry" type="button" hidden>重试保存</button><span id="note-count">0 字</span></div><div class="note-conflict" id="note-conflict" hidden><p>数据库已有不同内容，请选择要保留的版本，也可以先导出当前草稿。</p><button class="button subtle" id="note-use-database" type="button">使用数据库版本</button><button class="button subtle" id="note-use-local" type="button">用当前草稿覆盖</button></div><p class="note-migrations" id="note-migrations" hidden></p></div></section></div>
+      </article>
 
       <footer><span id="footer-company">公司投研看板</span><span id="connection-status">通用模板 / 后端接口尚未配置</span></footer>
     </main>
-  </div>
+  <button id="watchlist-backdrop" class="watchlist-backdrop" type="button" aria-label="关闭自选栏" hidden></button></div>
 
-  <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-heading"><div><span class="kicker">资料与状态</span><h2 id="source-title">数据来源</h2></div><button class="close-button" id="close-sources" aria-label="关闭数据来源">×</button></div><p class="dialog-intro">当前公司的资料与研究数据按模块加载；未接入的数据保持为空。</p><div class="source-row" id="profile-source"><div><strong>公司资料</strong><p>当前公司资料来源待接入</p></div><span>待接入</span></div><div class="source-row"><div><strong>Tushare</strong><p>日线行情、每日 PE/PB、逐券商盈利预测</p></div><span>待接入</span></div><div class="source-row"><div><strong>公开研报与外部观点</strong><p>核心分歧、作者、报告日期及证据</p></div><span>待检索</span></div><div class="source-row"><div><strong>新闻与公告</strong><p>公司及产业链事件、原文与发布时间</p></div><span>待获取</span></div><div class="dialog-note">模板研究问题仅用于提示研究方向。实际观点、行情、预测与事件均按当前证券代码加载，并保留来源。</div></dialog>
-  <dialog id="company-dialog" aria-labelledby="company-title">
-    <div class="dialog-heading"><div><span class="kicker">研究标的</span><h2 id="company-title">选择股票</h2></div><button class="close-button" id="close-company" aria-label="关闭股票选择">×</button></div>
-    <p class="dialog-intro">使用同一套模板，查看不同公司的研究数据。</p>
-    <form id="company-list-form" class="company-form"><label for="company-select">预置标的</label><div class="company-select-row"><select id="company-select"></select><button class="button primary" type="submit">查看标的</button></div></form>
-    <form id="company-custom-form" class="company-form custom-company"><h3>输入其他股票</h3><label for="company-code">证券代码</label><input id="company-code" required maxlength="32" placeholder="例如 600519.SH / 02313.HK" autocomplete="off" spellcheck="false"><label for="company-name">股票名称（可选）</label><input id="company-name" maxlength="80" placeholder="未填写时显示证券代码" autocomplete="off"><p class="company-hint">代码需与后端约定一致，保留交易所后缀和前导零。行情及研究内容由后端返回。</p><p id="company-error" role="alert" hidden></p><button class="button primary" type="submit">切换到此股票 ↗</button></form>
+  <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-heading"><div><h2 id="source-title">数据来源</h2></div><button class="close-button" id="close-sources" aria-label="关闭数据来源">×</button></div><p class="dialog-intro">当前公司的资料与研究数据按模块加载；未接入的数据保持为空。</p><div class="source-row" id="profile-source"><div><strong>公司资料</strong><p>当前公司资料来源待接入</p></div><span>待接入</span></div><div class="source-row" id="market-source"><div><strong>行情与历史估值</strong><p>按当前证券代码读取本地日 K、成交量及 PE-TTM / PB，实际来源与日期见各模块。</p></div><span>等待读取</span></div><div class="source-row" id="forecast-source"><div><strong>卖方 EPS 预测</strong><p>按当前证券代码读取本地公开研报样本，币种与 EPS 口径分别列示。</p></div><span>等待读取</span></div><div class="source-row"><div><strong>AI 联网研究</strong><p>正反方观点、原始来源、平台覆盖与研究限制</p></div><span>手动生成</span></div><div class="source-row"><div><strong>新闻与公告</strong><p>公司及产业链事件、原文与发布时间</p></div><span>待获取</span></div></dialog>
+  <dialog id="company-dialog" class="company-picker" aria-labelledby="company-title">
+    <div class="dialog-heading"><div><h2 id="company-title">选择研究标的</h2></div><button class="close-button" id="close-company" type="button" aria-label="关闭股票选择">×</button></div>
+    <div class="picker-current"><span class="picker-current-label">正在研究</span><strong id="company-current-name">—</strong><span id="company-current-ticker">—</span><span class="company-market-badge" id="company-current-market">—</span></div>
+    <form id="company-search-form" role="search"><label class="visually-hidden" for="company-search">搜索股票名称或证券代码</label><div class="picker-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg><input id="company-search" type="search" maxlength="100" placeholder="搜索名称或代码，如：德赛 / 002920" autocomplete="off" spellcheck="false" aria-describedby="company-search-scope" autofocus><kbd>↵</kbd></div></form>
+    <div class="picker-filter-bar"><div class="picker-markets" role="group" aria-label="按市场筛选"><button type="button" data-company-market="all" aria-pressed="true">全部</button><button type="button" data-company-market="a" aria-pressed="false">A 股</button><button type="button" data-company-market="h" aria-pressed="false">港股</button><button type="button" data-company-market="other" aria-pressed="false">其他</button></div><span id="company-search-scope">搜索已添加标的</span></div>
+    <section id="company-recent-section" class="picker-recent" aria-label="最近使用的股票" hidden><span class="picker-section-label">最近使用</span><div id="company-recent" class="picker-recent-chips"></div></section>
+    <div class="picker-list-heading"><strong id="company-results-label">已添加标的</strong><span id="company-results-count" role="status" aria-live="polite"></span></div>
+    <div id="company-results" class="company-results" role="group" aria-label="可选股票"></div>
+    <div id="company-empty" class="picker-empty" hidden><span aria-hidden="true">⌕</span><h3>没有找到匹配的标的</h3><p>可以更换关键词，或输入完整证券代码添加股票。</p><button class="button subtle" id="company-add-from-search" type="button">输入证券代码 +</button></div>
+    <details id="company-manual" class="company-manual"><summary><span><strong>添加其他股票</strong></span><span class="picker-manual-chevron" aria-hidden="true">＋</span></summary><form id="company-custom-form" class="company-form custom-company"><div class="picker-manual-fields"><div><label for="company-code">证券代码 <span>必填</span></label><input id="company-code" required maxlength="32" placeholder="600519.SH / 02313.HK" title="保留交易所后缀和前导零" autocomplete="off" spellcheck="false"></div><div><label for="company-name">股票名称 <span>选填</span></label><input id="company-name" maxlength="80" placeholder="股票名称" autocomplete="off"></div></div><button class="button primary" type="submit">添加并切换 <span aria-hidden="true">→</span></button></form></details>
+    <p id="company-error" class="picker-error" role="alert" hidden></p>
+    <div class="picker-footer"><span><kbd>↑</kbd><kbd>↓</kbd> 选择 <kbd>Enter</kbd> 切换</span><span><kbd>Esc</kbd> 关闭</span></div>
+  </dialog>
+  <dialog id="relation-editor-dialog" class="relation-editor-dialog" aria-labelledby="relation-editor-title">
+    <header><div><h2 id="relation-editor-title">修改上下游</h2><p id="relation-editor-context"></p></div><div class="relation-editor-heading-actions"><button class="button subtle" id="relation-editor-add-shortcut" type="button">添加公司</button><button type="button" id="close-relation-editor" class="close-button" aria-label="关闭关系编辑">×</button></div></header>
+    <div class="relation-editor-body" id="relation-editor-body">
+      <section aria-label="当前关系"><div id="relation-editor-rows" class="relation-editor-rows"></div><p id="relation-editor-empty" class="relation-editor-empty">暂无关联公司，可在下方添加。</p></section>
+      <section class="relation-editor-add" aria-labelledby="relation-editor-add-title"><h3 id="relation-editor-add-title">添加公司</h3><label class="visually-hidden" for="relation-company-search">搜索公司名称或证券代码</label><input type="search" id="relation-company-search" placeholder="搜索公司名称或证券代码" maxlength="100" autocomplete="off" spellcheck="false"><div id="relation-company-results" class="relation-company-results" aria-label="公司搜索结果"></div><p id="relation-search-status" role="status"></p><div class="relation-editor-add-controls"><label><span>关系</span><select id="relation-add-type"><option value="upstream">上游</option><option value="peer">同行</option><option value="downstream">下游</option></select></label><label class="relation-add-note-field"><span>备注（选填）</span><input id="relation-add-note" type="text" maxlength="2000" placeholder="填写关系备注"></label><button class="button subtle" id="relation-add-company" type="button" disabled>加入草稿</button></div></section>
+      <details id="relation-editor-removed" class="relation-editor-removed" hidden><summary>已移除公司</summary><div id="relation-editor-removed-list"></div></details>
+      <p id="relation-editor-error" class="relation-editor-error" role="alert" hidden></p>
+    </div>
+    <footer><button class="button subtle" id="relation-editor-reload" type="button" hidden>重新读取</button><div><button class="button subtle" id="relation-editor-cancel" type="button">取消</button><button class="button primary" id="relation-editor-save" type="button" disabled>保存修改</button></div></footer>
   </dialog>
   <div class="toast" id="toast" role="status"></div>
-</body>
-</html>
+  <dialog id="relation-evidence-dialog" class="relation-evidence-dialog" aria-labelledby="relation-evidence-title"><header><h2 id="relation-evidence-title">关系依据</h2><button type="button" id="close-relation-evidence" aria-label="关闭关系依据">×</button></header><div id="relation-evidence-content"></div></dialog>
+
+
+</body></html>

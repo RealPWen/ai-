@@ -6,3 +6,7 @@ dist/
 *.log
 desktop-preview.png
 company-template-preview.png
+backend/storage/
+core-debates-preview.png
+chatgpt-login-preview.png
+chatgpt-connection-preview.png

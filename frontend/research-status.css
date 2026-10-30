@@ -1,0 +1,30 @@
+/* Desktop research activity and the version currently being read. */
+.research-activity{width:100%;padding:15px 17px;border:1px solid #e0e8e5;background:#f7faf9;border-radius:9px}
+.research-activity-heading{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.research-activity-heading strong{font-size:var(--text-caption);color:#304c45;display:flex;align-items:center;gap:9px}
+.research-activity-heading strong:before{content:'';width:7px;height:7px;border-radius:50%;background:#97a8a2;flex:none}
+.research-activity-heading>span{font-size:var(--text-caption);color:#7c918c}
+.research-activity>p{font-size:var(--text-caption);color:#6d827b;line-height:1.8;margin-top:7px}
+.research-activity[data-tone=running]{background:#f0f7f5;border-color:#c9e0d7}
+.research-activity[data-tone=running] strong:before{background:#2f8e78;animation:research-pulse 1.5s ease-in-out infinite}
+.research-activity[data-tone=success]{background:#f0f7f2;border-color:#cce1d2}
+.research-activity[data-tone=success] strong:before{background:#5b9871}
+.research-activity[data-tone=error]{background:#fff6f0;border-color:#efd8c7}
+.research-activity[data-tone=error] strong,.research-activity[data-tone=error]>p{color:#9b6548}
+.research-activity[data-tone=error] strong:before{background:#be805d}
+.debate-controls .generation-note{border-top:0;padding-top:0;font-size:var(--text-caption);margin-top:-5px}
+.report-identity{border:1px solid #d7e4de;border-left:3px solid #5b8d7b;background:#fff;border-radius:9px;padding:17px 20px;margin:0 0 17px}
+.report-identity-heading{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.report-version-badge{background:#edf5f0;color:#477861;padding:4px 9px;border-radius:5px;font-size:var(--text-caption);font-weight:600}
+.report-identity-heading>strong{font-size:var(--text-caption);font-weight:550;color:#3a535f;font-variant-numeric:tabular-nums}
+.report-identity>p{color:#7d919a;font-size:var(--text-caption);line-height:1.8;margin-top:8px}
+.report-identity[data-tone=running] .report-version-badge,.report-identity[data-tone=error] .report-version-badge{color:#937341;background:#f8f1e3}
+.report-heading{margin:16px 2px 20px}
+@keyframes research-pulse{50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.research-activity[data-tone=running] strong:before{animation:none}}
+
+.research-service-error{flex-basis:100%;margin:0;color:#965348;font-size:var(--text-caption);line-height:1.6}
+.ima-source-badge{display:inline-block;padding:2px 8px;border-radius:5px;background:#e7f4f1;color:#176b61;font-size:12px;white-space:nowrap}
+.ima-evidence{margin-top:10px;font-size:13px;line-height:1.7;color:#405a6b}
+.ima-evidence>summary{cursor:pointer;color:#176b61}
+.ima-evidence blockquote{white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto;margin:8px 0;padding:12px;border-left:3px solid #b9dcd5;background:#f7faf9}

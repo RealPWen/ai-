@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "source": {
+    "path": "/Users/panwen/Desktop/A股与港股通价值投资池_2026-09-21.xlsx",
+    "sheet": "合并价值投资池",
+    "sha256": "79764ad3d2f306bfe8b98692cdd07474360a58765353afbc8012880aef112ebd",
+    "date": "2026-09-21"
+  },
+  "securities": [
+    {
+      "ticker": "02020.HK",
+      "name": "安踏体育",
+      "row": 6
+    },
+    {
+      "ticker": "09911.HK",
+      "name": "赤子城科技",
+      "row": 7
+    },
+    {
+      "ticker": "00175.HK",
+      "name": "吉利汽车",
+      "row": 8
+    },
+    {
+      "ticker": "02698.HK",
+      "name": "乐舒适",
+      "row": 9
+    },
+    {
+      "ticker": "00992.HK",
+      "name": "联想集团",
+      "row": 10
+    },
+    {
+      "ticker": "09973.HK",
+      "name": "奇瑞汽车",
+      "row": 11
+    },
+    {
+      "ticker": "03858.HK",
+      "name": "佳鑫国际资源",
+      "row": 20
+    },
+    {
+      "ticker": "02099.HK",
+      "name": "中国黄金国际",
+      "row": 21
+    },
+    {
+      "ticker": "00005.HK",
+      "name": "汇丰控股",
+      "row": 23
+    },
+    {
+      "ticker": "03690.HK",
+      "name": "美团－Ｗ",
+      "row": 24
+    },
+    {
+      "ticker": "02888.HK",
+      "name": "渣打集团",
+      "row": 25
+    },
+    {
+      "ticker": "03306.HK",
+      "name": "江南布衣",
+      "row": 27
+    },
+    {
+      "ticker": "09992.HK",
+      "name": "泡泡玛特",
+      "row": 28
+    },
+    {
+      "ticker": "01929.HK",
+      "name": "周大福",
+      "row": 29
+    },
+    {
+      "ticker": "09988.HK",
+      "name": "阿里巴巴－Ｗ",
+      "row": 33
+    },
+    {
+      "ticker": "00700.HK",
+      "name": "腾讯控股",
+      "row": 34
+    },
+    {
+      "ticker": "02513.HK",
+      "name": "智谱",
+      "row": 35
+    },
+    {
+      "ticker": "00981.HK",
+      "name": "中芯国际",
+      "row": 36
+    },
+    {
+      "ticker": "00038.HK",
+      "name": "第一拖拉机股份",
+      "row": 47
+    },
+    {
+      "ticker": "03606.HK",
+      "name": "福耀玻璃",
+      "row": 48
+    },
+    {
+      "ticker": "02232.HK",
+      "name": "晶苑国际",
+      "row": 49
+    },
+    {
+      "ticker": "02313.HK",
+      "name": "申洲国际",
+      "row": 50
+    },
+    {
+      "ticker": "02338.HK",
+      "name": "潍柴动力",
+      "row": 51
+    },
+    {
+      "ticker": "03808.HK",
+      "name": "中国重汽",
+      "row": 52
+    },
+    {
+      "ticker": "01171.HK",
+      "name": "兖矿能源",
+      "row": 59
+    },
+    {
+      "ticker": "00883.HK",
+      "name": "中国海洋石油",
+      "row": 60
+    },
+    {
+      "ticker": "01866.HK",
+      "name": "中国心连心化肥",
+      "row": 61
+    },
+    {
+      "ticker": "00525.HK",
+      "name": "广深铁路股份",
+      "row": 67
+    }
+  ]
+}

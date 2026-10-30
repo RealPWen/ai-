@@ -1,8 +1,10 @@
 /** Public frontend configuration. Never put Tushare/OpenAI keys here. */
 export const apiConfig = {
-  enabled: false,
+  enabled: true,
+  // The frontend server proxies /api to the local backend, including LAN visits.
   baseUrl: '',
   timeoutMs: 12000,
+  generationTimeoutMs: 360000,
   credentials: 'omit',
 };
 

@@ -1,0 +1,22 @@
+.stock-attribution{margin-top:24px;padding-top:24px;border-top:1px solid #e1e9f0;color:#456176}
+.attribution-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.attribution-heading-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.attribution-heading h3{margin:0;font-size:var(--text-heading);color:#203747;letter-spacing:.01em}
+.attribution-period{color:#167f78;font-weight:600;font-size:var(--text-caption);background:#edf7f4;border-radius:5px;padding:3px 8px}
+.attribution-status{font-size:var(--text-caption);border-radius:20px;padding:4px 9px;background:#f2f6f9;color:#6b8192}
+.attribution-status[data-state=stale]{background:#fff6e8;color:#9d6a24}.attribution-status[data-state=fresh]{background:#edf7f4;color:#147c71}.attribution-status[data-state=error]{background:#fdf0ed;color:#b95144}
+.attribution-actions{display:flex;gap:8px;flex-wrap:wrap}.attribution-actions .button{font-size:var(--text-caption);min-height:36px}
+.attribution-caption,.attribution-note{font-size:var(--text-caption);line-height:1.8;margin:10px 0;color:#758b9c}.attribution-note{color:#9a6c2b}
+.attribution-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:15px 0}
+.attribution-progress-item{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#f5f8fa;border:1px solid #e4ecf1;border-radius:7px;padding:10px 12px;font-size:var(--text-caption)}
+.attribution-progress-item strong{font-size:var(--text-caption)}.attribution-progress-item span{margin-left:auto;color:#78909f}.attribution-progress-item small{width:100%;line-height:1.7;color:#b65446}.attribution-progress-item[data-state=succeeded] span{color:#17867b}.attribution-progress-item[data-state=running]{border-color:#83bcb4}.attribution-progress-item[data-state=failed] span{color:#b65446}
+.attribution-empty{padding:24px 16px;background:#f8fafb;border:1px dashed #dce6ee;border-radius:8px;text-align:center;color:#8195a4;font-size:var(--text-caption);line-height:1.9}
+.attribution-report-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:20px 0 12px;font-size:var(--text-caption);color:#7c91a1}.attribution-report-meta strong{font-weight:500;color:#597185}
+.attribution-news-context{display:flex;flex-wrap:wrap;gap:5px 18px;margin:0 0 12px;font-size:var(--text-caption);line-height:1.8;color:#6d8596}.attribution-news-context .attribution-news-gap{color:#936b2e}
+.attribution-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;background:#f7fafb;border:1px solid #e6edf2;border-radius:8px;padding:18px 22px}
+.attribution-metric{display:flex;flex-direction:column;gap:7px;font-size:var(--text-caption);color:#7a8d9b}.attribution-metric strong{font-size:var(--text-heading);color:#33556b;font-weight:600}.attribution-metric.positive strong{color:#19877b}.attribution-metric.negative strong{color:#bf6558}
+.attribution-summary{font-size:var(--text-body);line-height:1.9;color:#38576c;margin:17px 0}.attribution-warning{font-size:var(--text-caption);color:#936b2e;line-height:1.8;background:#fff9ef;padding:10px 13px;border-radius:6px}
+.attribution-drivers{display:grid;gap:12px}.attribution-driver{border:1px solid #e3ebf1;border-radius:8px;padding:16px 18px}.attribution-driver-heading span{font-size:var(--text-caption);color:#6a9691}.attribution-driver h4{margin:5px 0 8px;font-size:var(--text-body);color:#294a60}.attribution-driver>p{font-size:var(--text-caption);line-height:1.9;margin:0;color:#5a7385}
+.attribution-evidence{font-size:var(--text-caption);color:#8395a2;line-height:1.8;margin-top:10px}.attribution-evidence blockquote{margin:0;padding-left:11px;border-left:2px solid #d7e5e9;color:#6f8595}.attribution-evidence p{margin:6px 0 0}.attribution-evidence a,.attribution-source a{color:#398c87;text-underline-offset:3px}.attribution-evidence span,.attribution-source span{font-size:var(--text-caption)}
+.attribution-details{margin-top:17px;font-size:var(--text-caption);color:#7b91a1}.attribution-details summary{cursor:pointer;color:#648496}.attribution-details>div{padding:5px 0;line-height:1.9}.attribution-meta{font-size:var(--text-caption);color:#8a9ba8}
+@media(max-width:700px){.attribution-heading{align-items:flex-start}.attribution-metrics{padding:15px 12px;gap:8px}.attribution-metric strong{font-size:var(--text-heading)}.attribution-progress{grid-template-columns:1fr}.attribution-driver{padding:13px}.attribution-actions{width:100%}}

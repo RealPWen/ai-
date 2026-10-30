@@ -1,0 +1,51 @@
+/* Shared chart geometry and financial colors. */
+.market-chart-summary { display:none; }
+.market-benchmark-legend { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px 16px; padding:0 0 10px; text-align:left; }
+.market-benchmark-identity { display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-width:0; font-size:13px; }
+.market-benchmark-identity strong { font-size:13px; font-weight:500; color:#626f9a; }
+.market-benchmark-label,.market-benchmark-basis { font-size:12px; color:var(--muted); }
+.market-benchmark-swatch { width:16px; height:2px; background:#7887b4; }
+.market-benchmark-status { color:var(--amber); font-size:12px; flex-basis:100%; }
+.market-benchmark-toggle { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--muted); cursor:pointer; }
+.market-benchmark-toggle input { width:13px; height:13px; margin:0; accent-color:#7887b4; }
+.market-inspection { display:flex; align-items:baseline; flex-wrap:wrap; gap:5px 14px; padding:8px 0; border-top:1px solid var(--line); text-align:left; font-variant-numeric:tabular-nums; }
+.market-inspection-prices,.market-inspection-trading { display:contents; }
+.market-inspection-date { font-size:12px; color:var(--muted); }
+.market-inspection-date strong { font-weight:500; }
+.market-inspection .market-stat { display:inline-flex; align-items:baseline; gap:5px; font-size:12px; white-space:nowrap; }
+.market-stat>span { color:var(--muted); }.market-stat>strong { font-size:12px; font-weight:500; color:var(--ink); }
+.market-chart { display:block; width:100%; height:320px; overflow:visible; touch-action:pan-y; }
+.market-chart .market-axis { fill:var(--muted); font:17px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; }
+.market-chart .market-axis-title { fill:#596570; }
+.market-grid-line { stroke:#edf0f2; stroke-width:1; }
+.market-candle.market-up { color:var(--up); }.market-candle.market-down { color:var(--down); }.market-candle.market-flat { color:var(--muted); }
+.market-candle-wick { stroke:currentColor; stroke-width:1.5; }.market-candle-body { fill:currentColor; }
+.market-volume-bar { opacity:.45; }.market-volume-bar.market-up { fill:var(--up); }.market-volume-bar.market-down { fill:var(--down); }.market-volume-bar.market-flat { fill:var(--muted); }
+.market-crosshair { stroke:#94b2a7; stroke-width:1; stroke-dasharray:4 4; pointer-events:none; }
+.market-selected-candle { fill:none; stroke:#698a80; stroke-width:1; stroke-dasharray:2 2; pointer-events:none; }
+.market-chart-hit,.valuation-band-hit { cursor:crosshair; }
+.market-benchmark-line { stroke:#7887b4; fill:none; stroke-width:1.7; stroke-linejoin:round; stroke-linecap:round; vector-effect:non-scaling-stroke; }
+.market-benchmark-point { fill:#7887b4; }
+.market-chart-details { margin-top:8px; padding-top:10px; border-top:1px solid var(--line); text-align:left; font-size:12px; color:var(--muted); }
+.market-chart-details>summary { color:var(--muted); }.market-chart-details>summary::after { content:' ＋'; }.market-chart-details[open]>summary::after { content:' −'; }
+.market-chart-details-body { display:grid; gap:6px; padding-top:10px; font-size:13px; overflow-wrap:anywhere; }
+.market-price-caption,.market-interaction-guide { color:var(--muted); font-size:12px; }
+.valuation-band-chart { display:block; width:100%; height:240px; overflow:visible; touch-action:pan-y; }
+.valuation-band-plot { fill:#fafbfc; }
+.valuation-band-axis { fill:var(--muted); font:14px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; }
+.valuation-band-gridline { stroke:#edf0f2; stroke-width:1; }
+.valuation-band-outer { fill:#f0f6f2; }.valuation-band-inner { fill:#dcebe2; }
+.valuation-band-quantile { stroke:#c2d8cc; stroke-width:1; }
+.valuation-band-median { stroke:#84ad97; stroke-width:1; stroke-dasharray:4 4; }
+.valuation-band-history { stroke:var(--teal); stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+.valuation-band-isolated { fill:var(--teal); }.valuation-band-cursor { stroke:#99b4a8; stroke-dasharray:3 3; stroke-width:1; pointer-events:none; }
+.valuation-band-selected { fill:white; stroke:var(--teal); stroke-width:2; pointer-events:none; }
+.valuation-band-inspection { display:flex; align-items:center; flex-wrap:wrap; gap:6px 16px; padding:6px 0; font-size:12px; color:var(--muted); }
+.valuation-band-inspection strong { font-weight:500; color:var(--ink); }
+.valuation-band-legend { display:flex; align-items:center; flex-wrap:wrap; gap:8px 16px; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.valuation-band-legend>span { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+.valuation-band-legend i { display:inline-block; width:16px; height:7px; }
+.valuation-band-legend-history { height:2px!important; background:var(--teal); }.valuation-band-legend-outer { background:#f0f6f2; border:1px solid #dcebe2; }.valuation-band-legend-inner { background:#dcebe2; }.valuation-band-legend-median { height:0!important; border-top:1px dashed #84ad97; }
+.valuation-loss,.valuation-loss>strong { color:var(--amber); }
+.data-chart { width:100%; height:240px; }
+@media(max-width:599px) { .market-chart { height:180px; }.market-chart .market-axis { font-size:32px; }.valuation-band-axis { font-size:22px; }.market-inspection { gap:4px 12px; }.market-inspection .market-stat,.market-inspection-date { font-size:11px; }.market-stat>strong { font-size:11px; }.valuation-band-chart { height:220px; } }

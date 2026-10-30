@@ -1,10 +1,38 @@
 {
-  "name": "company-research-frontend",
+  "name": "company-research",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "dev": "node scripts/build.mjs && python3 -m http.server 8765 --bind 127.0.0.1 --directory dist",
-    "test": "node --test tests/*.test.mjs"
+    "dev": "node scripts/build.mjs && node scripts/serve-frontend.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "backend": "node --env-file-if-exists=.env backend/server.mjs",
+    "data:sync": "node --env-file-if-exists=.env scripts/sync-market-data.mjs",
+    "data:securities": "node --env-file-if-exists=.env scripts/sync-securities.mjs",
+    "data:hk:securities": "node --env-file-if-exists=.env scripts/sync-hk-securities.mjs",
+    "data:valuations": "node --env-file-if-exists=.env scripts/sync-valuations.mjs",
+    "data:hk:valuations": "node --env-file-if-exists=.env scripts/sync-hk-valuations.mjs",
+    "data:forecasts": "node --env-file-if-exists=.env scripts/sync-forecasts.mjs",
+    "data:hk:forecasts": "node --env-file-if-exists=.env scripts/sync-hk-forecasts.mjs",
+    "data:industries": "node --env-file-if-exists=.env scripts/sync-industries.mjs",
+    "data:adjustments": "node --env-file-if-exists=.env scripts/sync-adjustments.mjs",
+    "data:relations": "node --env-file-if-exists=.env scripts/sync-relations.mjs",
+    "data:relations:cache": "node scripts/relations-evidence.mjs",
+    "data:news": "node --env-file-if-exists=.env scripts/sync-news.mjs",
+    "data:news:cls": "node --env-file-if-exists=.env scripts/sync-cls-news.mjs",
+    "data:news:cls:history": "node --env-file-if-exists=.env scripts/sync-cls-news-list.mjs",
+    "data:news:cls:search": "node --env-file-if-exists=.env scripts/sync-cls-news-search.mjs",
+    "data:update": "node --env-file-if-exists=.env scripts/update-daily-data.mjs",
+    "data:worker": "node --env-file-if-exists=.env scripts/daily-data-worker.mjs",
+    "data:hk:market": "node --env-file-if-exists=.env scripts/sync-hk-market.mjs",
+    "data:hk:audit": "node --env-file-if-exists=.env scripts/audit-hk-market.mjs",
+    "data:hk:index": "node --env-file-if-exists=.env scripts/sync-hk-index.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "pg": "^8.23.1"
   }
 }
