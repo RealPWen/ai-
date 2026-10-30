@@ -1,4 +1,4 @@
-node_modules/
+node_modules
 dist/
 .env
 .env.*
@@ -10,3 +10,16 @@ backend/storage/
 core-debates-preview.png
 chatgpt-login-preview.png
 chatgpt-connection-preview.png
+
+# Runtime artifacts and Mac metadata never belong to a module handoff.
+output/
+data_hub/
+._*
+.DS_Store
+*.parquet
+*.csv
+*.dump
+*.backup
+*.sqlite
+*.sqlite3
+!.env.tideos.example

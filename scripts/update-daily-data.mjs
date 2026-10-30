@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { fileURLToPath } from 'node:url';
 import { createMarketUpdateRuntime } from '../backend/market-data/update-runtime.mjs';
 import { todayShanghai, validDate } from '../backend/src/input.mjs';
@@ -30,7 +31,7 @@ try {
       hkValuationEnabled: process.env.HK_VALUATION_AUTO_UPDATE_ENABLED !== 'false',
       hkForecastEnabled: process.env.HK_FORECAST_AUTO_UPDATE_ENABLED !== 'false',
       newsEnabled: !skipNews && process.env.CLS_NEWS_AUTO_UPDATE_ENABLED !== 'false',
-      cacheDir: fileURLToPath(new URL('../backend/storage/market-data/', import.meta.url)), log: value => console.log(JSON.stringify(value)) });
+      cacheDir: dataPath('market-data'), log: value => console.log(JSON.stringify(value)) });
     const result = await runtime.runOnce({ runDate });
     process.exitCode = ['succeeded', 'already_completed'].includes(result.status) ? 0 : 2;
     if (result.status === 'disabled') console.error(JSON.stringify({ type: 'daily_update_failed', reason: result.reason }));

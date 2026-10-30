@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { HK_SECURITY_FIELDS, validateHkSecurities } from './hk-securities-store.mjs';
@@ -44,7 +45,7 @@ export async function syncHkPoolSecurities({ universe, client, store, cacheDir, 
   if (rows.length !== tickers.length || rows.some(s => !tickers.includes(s.ts_code))) throw invalid();
   const temp = `${path}.${randomUUID()}.tmp`;
   await writeFile(temp, `${JSON.stringify({ ...snapshot, rows })}\n`, { mode: 0o600 });
-  await rename(temp, path);
+  await replaceFile(temp, path);
   if (mode !== 'download') {
     await store.migrate();
     await store.upsertSecurities({ rows, fetchedAt: snapshot.fetchedAt });

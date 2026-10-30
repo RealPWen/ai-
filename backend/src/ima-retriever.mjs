@@ -37,16 +37,24 @@ export async function extractImaPdf(bytes, { signal, python = process.env.IMA_PY
   try {
     if (!python) {
       const bundled = path.join(homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3');
-      try { await access(bundled); python = bundled; } catch { python = 'python3'; }
+      try { await access(bundled); python = bundled; } catch { python = process.platform === 'win32' ? 'python' : 'python3'; }
     }
     const file = path.join(dir, 'report.pdf');
     await writeFile(file, bytes, { mode: 0o600 });
     const { stdout } = await run(python, [fileURLToPath(new URL('../research-data/extract-ima-pdf.py', import.meta.url)), file],
-      { signal, timeout: 50000, maxBuffer: 1024 * 1024, env: { PATH: process.env.PATH, HOME: homedir(), IMA_TESSERACT: process.env.IMA_TESSERACT || '/opt/homebrew/bin/tesseract' } });
+      { signal, timeout: 50000, maxBuffer: 1024 * 1024, env: extractionEnvironment() });
     const result = JSON.parse(stdout);
     if (!Array.isArray(result.pages)) throw fail('IMA_EXTRACTION_FAILED');
     return result.pages;
   } finally { await rm(dir, { recursive: true, force: true }); }
+}
+
+export function extractionEnvironment(env = process.env) {
+  // Preserve Windows runtime discovery without passing provider keys to Python.
+  const result = Object.fromEntries(Object.entries(env).filter(([name]) =>
+    ['path', 'systemroot', 'windir', 'temp', 'tmp', 'tmpdir', 'userprofile', 'home', 'lang', 'lc_all'].includes(name.toLowerCase())));
+  return { ...result, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8',
+    IMA_TESSERACT: env.IMA_TESSERACT?.trim() || 'tesseract' };
 }
 
 export async function createImaRetriever({ enabled = true, credentials, fetchImpl = globalThis.fetch,

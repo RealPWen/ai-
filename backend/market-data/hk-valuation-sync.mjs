@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 import { gzipSync, gunzipSync } from 'node:zlib';
@@ -12,7 +13,7 @@ import { normalizeTradeDate } from './postgres-store.mjs';
 function invalid(){const error=new Error('港股估值同步参数或缓存无效。');error.kind='validation';return error;}
 function safeCode(error){return {network:'network_error',timeout:'network_error',rate_limit:'rate_limited',permission:'permission_denied',http:'permission_denied',database:'database_error',validation:'validation_error',invalid_response:'validation_error',incomplete_window:'incomplete_window',no_data:'no_data'}[error?.kind]??'provider_error';}
 async function quarantine(path) {
-  try { await rename(path, `${path}.rejected-${randomUUID()}`); }
+  try { await replaceFile(path, `${path}.rejected-${randomUUID()}`); }
   catch (error) { if (error.code !== 'ENOENT') throw error; }
 }
 function validatePayload(value,identity,all){
@@ -44,7 +45,7 @@ async function cachedOrCollect({path,identity,collector,all,retryNoData}){
   validatePayload(result,identity,all);
   const value={version:1,...identity,rows:result.rows,coverage:result.coverage??null,raw:result.raw??null,fetchedAt:new Date().toISOString()};
   const temp=`${path}.tmp-${process.pid}-${randomUUID()}`;
-  await writeFile(temp,gzipSync(Buffer.from(JSON.stringify(value)+'\n')),{mode:0o600});await rename(temp,path);
+  await writeFile(temp,gzipSync(Buffer.from(JSON.stringify(value)+'\n')),{mode:0o600});await replaceFile(temp,path);
   return {...value,cached:false};
 }
 function validateCatalog(catalog,runDate){

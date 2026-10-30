@@ -1,4 +1,5 @@
 import { cp, mkdir, readdir, rm } from 'node:fs/promises';
+import { basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const source = fileURLToPath(new URL('../frontend/', import.meta.url));
@@ -8,5 +9,5 @@ await mkdir(output, { recursive: true });
 for (const name of await readdir(output)) {
   if (name !== '.openai') await rm(`${output}/${name}`, { recursive: true, force: true });
 }
-await cp(source, output, { recursive: true });
+await cp(source, output, { recursive: true, filter: path => !basename(path).startsWith('._') && basename(path) !== '.DS_Store' });
 console.log('Frontend built: frontend/ → dist/');

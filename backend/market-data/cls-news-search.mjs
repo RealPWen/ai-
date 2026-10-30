@@ -1,5 +1,6 @@
+import { replaceFile } from '../src/replace-file.mjs';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { clsPublicChecksum, normalizeClsList } from './cls-news-list.mjs';
 import { matchClsArticle, CLS_SOURCE_API, CLS_SOURCE_NAME } from './cls-news-sync.mjs';
@@ -61,7 +62,7 @@ export function normalizeClsSearchRows(rows, range) {
 }
 
 async function atomicJson(path, value) {
-  const temporary = `${path}.tmp-${process.pid}`; await writeFile(temporary, `${JSON.stringify(value)}\n`, { mode: 0o600 }); await rename(temporary, path);
+  const temporary = `${path}.tmp-${process.pid}`; await writeFile(temporary, `${JSON.stringify(value)}\n`, { mode: 0o600 }); await replaceFile(temporary, path);
 }
 function checkpointValid(value, keyword) {
   return value?.version === 1 && value.sourceApi === CLS_SOURCE_API && value.searchType === CLS_SEARCH_TYPE && value.searchKeyword === keyword

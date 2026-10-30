@@ -1,10 +1,10 @@
+import { dataPath, automaticUpdatesEnabled } from './src/runtime-config.mjs';
 import { createRelationAttributionService } from './src/relation-attribution-service.mjs';
 import { createWatchlistAttributionRuntime } from './src/watchlist-attribution-runtime.mjs';
 import { createWatchlistStore } from './src/watchlist-store.mjs';
 import { createNotesStore } from './src/notes-store.mjs';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { fileURLToPath } from 'node:url';
 import { createResearchServer } from './app.mjs';
 import { createChatGPTAuth } from './src/chatgpt-auth.mjs';
 import { createChatGPTClient } from './src/chatgpt-client.mjs';
@@ -45,7 +45,7 @@ const provider = process.env.AI_PROVIDER?.trim() || 'deepseek';
 if (!['deepseek', 'chatgpt'].includes(provider)) throw new Error('AI_PROVIDER should be deepseek or chatgpt');
 const model = provider === 'deepseek' ? process.env.DEEPSEEK_MODEL?.trim() || DEFAULT_DEEPSEEK_MODEL : process.env.CHATGPT_MODEL?.trim() || null;
 let auth, client, service, aiStatus;
-const directory = fileURLToPath(new URL('./storage/debates/', import.meta.url));
+const directory = dataPath('debates');
 const debateStore = process.env.DATABASE_URL?.trim() ? createDebateStore({ connectionString: process.env.DATABASE_URL }) : null;
 if (debateStore) {
   await debateStore.migrate();
@@ -70,7 +70,7 @@ if (provider === 'deepseek') {
     ima: { enabled: imaRetriever.enabled, configured: imaRetriever.configured },
     error: apiKey ? null : { code: 'DEEPSEEK_MISSING_API_KEY', message: '请在后端 .env 配置 DEEPSEEK_API_KEY 并重启后端' } });
 } else {
-  auth = await createChatGPTAuth({ directory: fileURLToPath(new URL('./storage/chatgpt/', import.meta.url)), redirectUri: `http://127.0.0.1:${port}/auth/callback`, fetchImpl });
+  auth = await createChatGPTAuth({ directory: dataPath('chatgpt'), redirectUri: `http://127.0.0.1:${port}/auth/callback`, fetchImpl });
   client = createChatGPTClient({ auth, model: model || undefined, fetchImpl, timeoutMs: 45000, researchTimeoutMs: 300000 });
   service = createSubscriptionResearchService({ auth, client, directory, cache: debateStore ?? undefined, prompt, promptVersion, fingerprint });
 }
@@ -111,8 +111,8 @@ const marketUpdater = createMarketUpdateRuntime({ connectionString: process.env.
   hkValuationScope: process.env.HK_VALUATION_SCOPE || 'all',
   hkValuationEnabled: process.env.HK_VALUATION_AUTO_UPDATE_ENABLED !== 'false',
   hkForecastEnabled: process.env.HK_FORECAST_AUTO_UPDATE_ENABLED !== 'false',
-  cacheDir: fileURLToPath(new URL('./storage/market-data/', import.meta.url)),
-  enabled: process.env.MARKET_AUTO_UPDATE_ENABLED !== 'false', catchUp: process.env.MARKET_AUTO_UPDATE_CATCH_UP !== 'false',
+  cacheDir: dataPath('market-data'),
+  enabled: automaticUpdatesEnabled('MARKET_AUTO_UPDATE_ENABLED'), catchUp: process.env.MARKET_AUTO_UPDATE_CATCH_UP !== 'false',
   newsEnabled: process.env.CLS_NEWS_AUTO_UPDATE_ENABLED !== 'false',
   log: value => console.log(JSON.stringify(value)) });
 const watchlistStore = process.env.DATABASE_URL?.trim() ? createWatchlistStore({ connectionString: process.env.DATABASE_URL }) : null;
@@ -121,12 +121,12 @@ const notesStore = process.env.DATABASE_URL?.trim() ? createNotesStore({ connect
 await notesStore?.migrate();
 const watchlistAttributionRuntime = watchlistStore && attributionService ? createWatchlistAttributionRuntime({
  connectionString: process.env.DATABASE_URL, watchlistStore, service: attributionService,
- enabled: process.env.WATCHLIST_ATTRIBUTION_AUTO_UPDATE_ENABLED !== 'false', log: value => console.log(JSON.stringify(value)) }) : null;
+ enabled: automaticUpdatesEnabled('WATCHLIST_ATTRIBUTION_AUTO_UPDATE_ENABLED'), log: value => console.log(JSON.stringify(value)) }) : null;
 await watchlistAttributionRuntime?.migrate();
 const relativePrompt = await readFile(new URL('./prompts/relation-attribution.md', import.meta.url), 'utf8');
 const relationAttributionService = watchlistStore && relationsService ? createRelationAttributionService({
  connectionString: process.env.DATABASE_URL, relationsService, watchlistStore, client, prompt: relativePrompt,
- enabled: process.env.RELATION_ATTRIBUTION_AUTO_UPDATE_ENABLED !== 'false', log: value => console.log(JSON.stringify(value)) }) : null;
+ enabled: automaticUpdatesEnabled('RELATION_ATTRIBUTION_AUTO_UPDATE_ENABLED'), log: value => console.log(JSON.stringify(value)) }) : null;
 await relationAttributionService?.migrate();
 const server = createResearchServer({ service, auth, aiStatus, watchlistStore, notesStore, watchlistAttributionRuntime, relationAttributionService, chatClient: client, marketService, forecastService, relationsService, relationsManualService, relationsAiService, newsService, attributionService, health: { status: 'ok', provider, model, promptVersion, transport, notesData: notesStore ? 'postgresql' : 'not_configured', debatesData: debateStore ? 'postgresql' : 'file', marketData: marketService ? 'postgresql' : 'not_configured', forecastData: forecastService ? 'postgresql' : 'not_configured', relationsData: relationsService ? 'postgresql' : 'not_configured', relationsManualData: relationsManualService ? 'postgresql' : 'not_configured', relationsAiData: relationsAiService ? 'postgresql' : 'not_configured', newsData: newsService ? 'postgresql' : 'not_configured', attributionData: attributionService ? 'postgresql' : 'not_configured', get marketAutoUpdate() { return marketUpdater.snapshot(); } } });
 server.listen(port, '127.0.0.1', () => { console.log(`Research backend: http://127.0.0.1:${port} (${provider})`); marketUpdater.start(); watchlistAttributionRuntime?.start(); relationAttributionService?.startDaily(); });

@@ -206,3 +206,28 @@ test('proxy configuration accepts only loopback HTTP destinations', () => {
     assert.throws(() => createFrontendServer({ backendOrigin }), /local HTTP origin/);
   }
 });
+
+test('TideOS mount redirects its entry and serves assets beneath its prefix only', async t => {
+  const get = await fixture(t, { basePath: '/company-research' });
+  const redirect = await get('/company-research?ticker=002920.SZ');
+  assert.equal(redirect.status, 307); assert.equal(redirect.headers.location, '/company-research/?ticker=002920.SZ');
+  assert.equal((await get('/company-research/')).status, 200);
+  assert.equal((await get('/company-research/src/app.js')).status, 200);
+  assert.equal((await get('/src/app.js')).status, 404);
+  assert.equal((await get('/company-researcher/')).status, 404);
+});
+test('TideOS proxy supports preserved or rewritten Host and strips only the module prefix', async t => {
+  const upstream = await backend(t);
+  const get = await fixture(t, { basePath: '/company-research', publicOrigin: 'https://tideos.example.com', backendOrigin: upstream.origin, proxyEnabled: true });
+  for (const host of ['tideos.example.com', new URL(get.origin).host]) {
+    const result = await get('/company-research/api/notes?owner=%E6%BD%98%E9%97%BB', 'POST', {
+      headers: { Host: host, Origin: 'https://tideos.example.com', 'Content-Type': 'application/json', Cookie: 'tideos=session' }, body: '{}',
+    });
+    assert.equal(result.status, 200); assert.equal(upstream.received.at(-1).url, '/api/notes?owner=%E6%BD%98%E9%97%BB');
+    assert.equal(upstream.received.at(-1).headers.cookie, undefined);
+  }
+  assert.equal((await get('/company-research/api/health', 'POST', { headers: { Origin: 'https://untrusted.example' } })).status, 403);
+  const lan = await fixture(t, { publicOrigin: 'https://tideos.example.com', backendOrigin: upstream.origin, proxyEnabled: true, remoteAddress: '192.0.2.55' });
+  assert.equal((await lan('/api/health', 'GET', { headers: { Host: 'tideos.example.com' } })).status, 403);
+  assert.equal((await lan('/api/health', 'POST', { headers: { Origin: 'https://tideos.example.com' } })).status, 403);
+});

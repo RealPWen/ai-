@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename, unlink } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { gzipSync, gunzipSync } from 'node:zlib';
@@ -19,7 +20,7 @@ async function readJson(path, compressed = false) {
 }
 async function atomicJson(path, value, compressed = false) {
   const bytes = Buffer.from(`${JSON.stringify(value)}\n`), temporary = `${path}.tmp-${process.pid}`;
-  await writeFile(temporary, compressed ? gzipSync(bytes) : bytes, { mode: 0o600 }); await rename(temporary, path);
+  await writeFile(temporary, compressed ? gzipSync(bytes) : bytes, { mode: 0o600 }); await replaceFile(temporary, path);
 }
 function validTimestamp(value) { return typeof value === 'string' && Number.isFinite(Date.parse(value)); }
 function validCalendar(value, start, end) {

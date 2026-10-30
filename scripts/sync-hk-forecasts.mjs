@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { fileURLToPath } from 'node:url';
 import { createHkForecastStore } from '../backend/market-data/hk-forecast-store.mjs';
 import { updateRollingHkForecasts } from '../backend/market-data/hk-forecast-sync.mjs';
@@ -18,7 +19,7 @@ try {
     if(!['all','pool'].includes(scope)||!Number.isInteger(concurrency)||concurrency<1||concurrency>3)throw new Error('invalid_arguments');
     store=createHkForecastStore({connectionString:process.env.DATABASE_URL});
     const client=scope==='all'&&process.env.TUSHARE_TOKEN?.trim()?createTushareClient({token:process.env.TUSHARE_TOKEN,intervalMs:400,maxRetries:0}):undefined;
-    const result=await updateRollingHkForecasts({store,client,scope,concurrency,runDate:todayShanghai(),cacheDir:fileURLToPath(new URL('../backend/storage/market-data/',import.meta.url)),log:value=>console.log(JSON.stringify(value))});
+    const result=await updateRollingHkForecasts({store,client,scope,concurrency,runDate:todayShanghai(),cacheDir:dataPath('market-data'),log:value=>console.log(JSON.stringify(value))});
     process.exitCode=['succeeded','already_completed'].includes(result.status)?0:2;
   }
 } catch {console.error(JSON.stringify({type:'hk_forecast_update_failed',errorCode:'configuration_or_runtime'}));process.exitCode=1;}

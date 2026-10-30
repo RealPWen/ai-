@@ -1,3 +1,4 @@
+import { apiPath } from '../../config.js';
 import { sanitizeCompanies } from './company-picker.js';
 import { createWatchlistQuotes } from './watchlist-quotes.js';
 
@@ -33,7 +34,7 @@ export function initWatchlist({ getCompany, getAsOf = () => '', loadQuote, onSel
   const ownerKey = 'company-research.watchlist-owner.v1';
   let ownerInput, ownerButton, ownerPanel, ownerSummary;
   async function request(ownerName, change) {
-    const response = await fetch(`/api/watchlist${change ? '' : `?owner=${encodeURIComponent(ownerName)}`}`, {
+    const response = await fetch(apiPath(`/api/watchlist${change ? '' : `?owner=${encodeURIComponent(ownerName)}`}`), {
       method: change ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' },
       ...(change ? { body: JSON.stringify({ ...change, owner: ownerName }) } : {}), signal: AbortSignal.timeout(15000),
     });

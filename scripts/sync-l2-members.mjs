@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { resolve } from 'node:path';
 import { createTushareClient } from '../backend/market-data/tushare-client.mjs';
 import { createIndustryStore } from '../backend/market-data/industry-store.mjs';
@@ -14,7 +15,7 @@ try {
       else if (args[index] === '--mode' && !modeSet && ['sync', 'download', 'import'].includes(args[index + 1])) { mode = args[++index]; modeSet = true; }
       else throw new Error('invalid_arguments');
     }
-    const cacheDir = resolve('backend/storage/market-data'), client = mode === 'import' ? null : createTushareClient({ token: process.env.TUSHARE_TOKEN, intervalMs: 400 });
+    const cacheDir = dataPath('market-data'), client = mode === 'import' ? null : createTushareClient({ token: process.env.TUSHARE_TOKEN, intervalMs: 400 });
     const log = value => console.log(JSON.stringify(value));
     const classification = await collectL2Classification({ client, cacheDir, mode, refresh, log });
     const members = await collectL2Members({ client, cacheDir, classification, mode, refresh, log });

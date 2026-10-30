@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { gzipSync, gunzipSync } from 'node:zlib';
@@ -82,7 +83,7 @@ async function cachedOrCollect({ path, identity, collect, options, allowEmpty })
   const temporary = `${path}.tmp-${process.pid}-${randomUUID()}`;
   await writeFile(temporary, gzipSync(Buffer.from(`${JSON.stringify({ version: 1, ...identity, rows: value.rows,
     ...(value.raw ? { raw: value.raw } : {}), fetchedAt: new Date().toISOString() })}\n`)), { mode: 0o600 });
-  await rename(temporary, path);
+  await replaceFile(temporary, path);
   return { rows: value.rows, cached: false };
 }
 

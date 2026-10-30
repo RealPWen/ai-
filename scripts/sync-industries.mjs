@@ -1,3 +1,4 @@
+import { dataPath } from '../backend/src/runtime-config.mjs';
 import { resolve } from 'node:path';
 import { createTushareClient } from '../backend/market-data/tushare-client.mjs';
 import { createIndustryStore } from '../backend/market-data/industry-store.mjs';
@@ -17,7 +18,7 @@ try {
     if (!options.start || !options.end || (options.mode && !['sync', 'download', 'import'].includes(options.mode))) throw new Error('invalid_arguments');
     const mode = options.mode ?? 'sync', client = mode === 'import' ? null : createTushareClient({ token: process.env.TUSHARE_TOKEN, intervalMs: 400 });
     if (mode !== 'download') store = createIndustryStore({ connectionString: process.env.DATABASE_URL });
-    const report = await syncIndustries({ client, store, mode, refresh: options.refresh ?? false, reimport: options.reimport ?? false, startDate: options.start, endDate: options.end, cacheDir: resolve('backend/storage/market-data'), log: value => console.log(JSON.stringify(value)) });
+    const report = await syncIndustries({ client, store, mode, refresh: options.refresh ?? false, reimport: options.reimport ?? false, startDate: options.start, endDate: options.end, cacheDir: dataPath('market-data'), log: value => console.log(JSON.stringify(value)) });
     const { days, ...summary } = report; console.log(JSON.stringify({ type: 'industry_summary', ...summary })); process.exitCode = report.status === 'completed' ? 0 : 2;
   }
 } catch { console.error(JSON.stringify({ type: 'industry_failed', kind: 'configuration_or_runtime', message: '请检查日期参数、Tushare 权限及数据库配置。' })); process.exitCode = 1; }

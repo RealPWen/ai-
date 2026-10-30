@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { replaceFile } from '../src/replace-file.mjs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { gzipSync, gunzipSync } from 'node:zlib';
@@ -53,7 +54,7 @@ async function cachedOrCollect({ cacheDir, ticker, range, collect, retryEmpty, c
   catch (error) {
     if (error.code !== 'ENOENT') {
       // Preserve a damaged cache for audit, then fetch the range again.
-      await rename(path, `${path}.invalid-${randomUUID()}`);
+      await replaceFile(path, `${path}.invalid-${randomUUID()}`);
     }
   }
   if (cached) {
@@ -75,7 +76,7 @@ async function cachedOrCollect({ cacheDir, ticker, range, collect, retryEmpty, c
   const temporary = `${path}.tmp-${randomUUID()}`;
   await writeFile(temporary, gzipSync(Buffer.from(`${JSON.stringify({ version: 1, ...identity, ...semantics, rows: value.rows, raw: value.raw,
     fetchedAt: new Date().toISOString() })}\n`)), { mode: 0o600 });
-  await rename(temporary, path);
+  await replaceFile(temporary, path);
   return { rows: value.rows, cached: false };
 }
 
@@ -134,7 +135,7 @@ export async function updateRollingHongKongMarket({ client, store, cacheDir, run
         const path = join(directory, `${window.runDate}.json`), temporary = `${path}.tmp-${randomUUID()}`;
         await writeFile(temporary, `${JSON.stringify({ source: 'tushare', apiName: 'hk_tradecal', ...window,
           fetchedAt: new Date().toISOString(), rows: [...calendar].map(([cal_date, is_open]) => ({ cal_date, is_open })) })}\n`, { mode: 0o600 });
-        await rename(temporary, path);
+        await replaceFile(temporary, path);
       }
       let fatal = null, nextSecurity = 0;
       const worker = async workerIndex => {

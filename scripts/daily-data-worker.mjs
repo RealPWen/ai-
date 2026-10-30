@@ -1,5 +1,8 @@
+import { dataPath, isTideOS } from '../backend/src/runtime-config.mjs';
 import { fileURLToPath } from 'node:url';
 import { createMarketUpdateRuntime } from '../backend/market-data/update-runtime.mjs';
+
+if (isTideOS()) { console.log(JSON.stringify({ type: 'daily_update_failed', reason: 'TideOS owns scheduling; use scripts/tideos-run.mjs' })); process.exit(1); }
 
 const runtime = createMarketUpdateRuntime({ connectionString: process.env.DATABASE_URL, token: process.env.TUSHARE_TOKEN,
   hkProvider: process.env.HK_PRICE_PROVIDER || 'eastmoney',
@@ -8,7 +11,7 @@ const runtime = createMarketUpdateRuntime({ connectionString: process.env.DATABA
   hkValuationScope: process.env.HK_VALUATION_SCOPE || 'all',
   hkValuationEnabled: process.env.HK_VALUATION_AUTO_UPDATE_ENABLED !== 'false',
   hkForecastEnabled: process.env.HK_FORECAST_AUTO_UPDATE_ENABLED !== 'false',
-  cacheDir: fileURLToPath(new URL('../backend/storage/market-data/', import.meta.url)),
+  cacheDir: dataPath('market-data'),
   newsEnabled: process.env.CLS_NEWS_AUTO_UPDATE_ENABLED !== 'false',
   catchUp: process.env.MARKET_AUTO_UPDATE_CATCH_UP !== 'false', log: value => console.log(JSON.stringify(value)) });
 if (!runtime.snapshot().enabled) {

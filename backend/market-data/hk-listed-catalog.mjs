@@ -1,6 +1,7 @@
+import { replaceFile } from '../src/replace-file.mjs';
 import { createHash, randomUUID } from 'node:crypto';
 import { inflateRawSync } from 'node:zlib';
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { load } from 'cheerio';
 import { normalizeTradeDate } from './postgres-store.mjs';
@@ -199,7 +200,7 @@ export function buildHkListedCatalog({ hkex, tushareRows, asOf, fetchedAt = new 
 
 async function atomicJson(path, value) {
   const temporary = `${path}.tmp-${randomUUID()}`;
-  await writeFile(temporary, `${JSON.stringify(value)}\n`, { mode: 0o600 }); await rename(temporary, path);
+  await writeFile(temporary, `${JSON.stringify(value)}\n`, { mode: 0o600 }); await replaceFile(temporary, path);
 }
 export async function loadHkListedCatalog(path) {
   const value = JSON.parse(await readFile(path, 'utf8'));
